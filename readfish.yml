@@ -1,0 +1,14 @@
+name: readfish_graph
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.8
+  - pip
+  - pip:
+    - read-until==v3.0.0
+    - git+ssh://git@github.com/samhorsfield96/readfish@graph_alignment
+    - ont-pyguppy-client-lib==6.0.7
+    - git+ssh://git@github.com/nanoporetect/minknow_api@5.0.0#subdirectory=python
+
