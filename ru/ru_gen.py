@@ -18,7 +18,7 @@ import toml
 
 from ru.arguments import BASE_ARGS
 from ru.basecall import Mapper as CustomMapper
-from graphalign.khmer_mapper import Mapper as GraphMapper
+from ru.graphalign.khmer_mapper import Mapper as GraphMapper
 from ru.basecall import GuppyCaller as Caller
 from ru.utils import (
     print_args,
