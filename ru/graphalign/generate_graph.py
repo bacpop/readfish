@@ -1,3 +1,4 @@
+from Bio import SeqIO
 import khmer
 from khmer import khmer_args
 from oxli.functions import build_graph
@@ -17,17 +18,17 @@ def get_options():
                     type=str,
                     help='Output prefix for gfa file. ')
     IO.add_argument('--kmer',
-                    default=None,
+                    default=15,
                     type=int,
                     help='Kmer size (default=15). ')
     IO.add_argument('--maxtable',
-                    default=None,
+                    default=1e5,
                     type=int,
-                    help='Maximum khmer table size (default=None). ')
+                    help='Maximum khmer table size (default=1e6). ')
     IO.add_argument('--numtable',
-                    default=None,
+                    default=4,
                     type=int,
-                    help='Number of khmer tables (default=None). ')
+                    help='Number of khmer tables (default=4). ')
     IO.add_argument('--threads',
                     default=1,
                     type=int,
@@ -47,24 +48,15 @@ def main():
 
     dataset = []
 
-    with open(infile, "r") as f:
-        for line in f:
-            dataset.append(line.strip())
-
-    parser = khmer_args.build_counting_args("Aligns reads to count graph")
-
-    args = parser.parse_args()
-
-    if kmer is None:
-        kmer = args.ksize
-    if maxtable is None:
-        maxtable = args.max_tablesize
-    if numtable:
-        numtable = args.n_tables
+    fasta_sequences = SeqIO.parse(open(infile),'fasta')
+    for fasta in fasta_sequences:
+        dataset.append(str(fasta.seq))
 
     countgraph = khmer.Countgraph(kmer, maxtable, numtable)
 
     build_graph(dataset, countgraph, num_threads=threads)
+
+    countgraph.save(outpref + ".khmer")
 
     countgraph.save(outpref + ".khmer")
 
