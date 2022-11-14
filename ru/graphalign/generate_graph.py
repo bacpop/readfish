@@ -56,3 +56,6 @@ def main():
     build_graph(dataset, countgraph, num_threads=threads)
 
     countgraph.save(outpref + ".khmer")
+
+if __name__ == "__main__":
+    main()
