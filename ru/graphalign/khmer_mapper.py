@@ -1,6 +1,6 @@
 import khmer
 from khmer import khmer_args
-from long_align import align_long
+from .long_align import align_long
 
 class Mapper:
     def __init__(self, index):
