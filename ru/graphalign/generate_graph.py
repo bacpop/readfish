@@ -48,15 +48,12 @@ def main():
 
     dataset = []
 
-    fasta_sequences = SeqIO.parse(open(infile),'fasta')
-    for fasta in fasta_sequences:
-        dataset.append(str(fasta.seq))
+    with open(infile, "r") as f:
+        for line in f:
+            dataset.append(line.strip())
 
     countgraph = khmer.Countgraph(kmer, maxtable, numtable)
 
     build_graph(dataset, countgraph, num_threads=threads)
 
     countgraph.save(outpref + ".khmer")
-
-    countgraph.save(outpref + ".khmer")
-
