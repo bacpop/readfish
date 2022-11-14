@@ -525,6 +525,7 @@ def simple_analysis_graph(
     caller = Caller(
         address="{}/{}".format(caller_kwargs["host"], caller_kwargs["port"]),
         config=caller_kwargs["config_name"],
+        align_ref=caller_kwargs["align_ref"],
     )
     # What if there is no reference or an empty MMI
 
