@@ -1,4 +1,3 @@
-from Bio import SeqIO
 import khmer
 from khmer import khmer_args
 from oxli.functions import build_graph
