@@ -7,7 +7,7 @@ class Mapper:
         self.index = index
         if self.index:
             self.graph = khmer.Countgraph.load(index)
-            self.mapper = khmer.ReadAligner(index, 1)
+            self.mapper = khmer.ReadAligner(self.graph, 1)
             self.initialised = True
         else:
             self.mapper = None
@@ -37,4 +37,4 @@ class Mapper:
         mapping_results : list
         """
         for read_info, read_id, seq, seq_len, quality in calls:
-            yield read_info, read_id, seq_len, list(align_long(self.graph, self.mapper, seq))
+            yield read_info, read_id, seq_len, align_long(self.graph, self.mapper, seq)

@@ -318,6 +318,10 @@ def align_long(ct, aligner, sta):
         seed_pos = find_highest_abund_kmer(ct, region)
         seeds.append(start + seed_pos)
 
+    # if no seeds found, return
+    if not seeds:
+        return 0
+
     assert len(seeds) == len(set(seeds))
 
     # then, break between-seed intervals down into regions, starting at
@@ -327,7 +331,6 @@ def align_long(ct, aligner, sta):
         seed_pos = seeds[i]
         end_seed = seeds[i + 1] - 1
         region_coords.append((seed_pos, end_seed + K))
-
     # account for situation where last region is too small to align.
     if len(sta) - seeds[-1] > K:
         region_coords.append((seeds[-1], len(sta)))
@@ -336,7 +339,7 @@ def align_long(ct, aligner, sta):
         region_coords.append((last_seed, len(sta)))
 
     # start building piecewise alignments, anchored by seeds.
-    alignments = []
+    #alignments = []
     scores = []
 
     n = 0
@@ -344,7 +347,7 @@ def align_long(ct, aligner, sta):
         score, galign = align_segment_right(aligner, sta[start:end],
                                             next_ch=sta[end])
         scores.append(score)
-        alignments.append(galign)
+        #alignments.append(galign)
 
         n += 1
 
@@ -352,7 +355,7 @@ def align_long(ct, aligner, sta):
     (start, end) = region_coords[-1]
     score, galign = align_segment_right(aligner, sta[start:end])
 
-    alignments.append(galign)
+    #alignments.append(galign)
     scores.append(score)
 
     # deal with beginning, too: reverse align from first seed.
@@ -360,13 +363,13 @@ def align_long(ct, aligner, sta):
     score, galign = align_segment_left(aligner, leftend)
 
     galign = galign[:-1]  # trim off seed k-mer
-    alignments.insert(0, galign)
+    #alignments.insert(0, galign)
     scores.insert(0, score)
 
     # stitch all the alignments together
-    final = stitch(alignments, K)
+    #final = stitch(alignments, K)
 
-    return sum(scores), final
+    return sum(scores)
 
 
 def find_highest_abund_kmer(ct, r):

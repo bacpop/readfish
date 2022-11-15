@@ -59,7 +59,16 @@ _cli = BASE_ARGS + (
         "--graph_align",
         dict(
             help="Use graph alignment",
-            default="False",
+            default=False,
+            type=bool,
+        ),
+    ),
+    (
+        "--score_threshold",
+        dict(
+            help="Read score threshold",
+            default=0,
+            type=float,
         ),
     ),
 )
@@ -461,6 +470,7 @@ def simple_analysis_graph(
     conditions=None,
     mapper=None,
     caller_kwargs=None,
+    score_threshold=0
 ):
     """Analysis function
     Parameters
@@ -490,6 +500,8 @@ def simple_analysis_graph(
         Experimental conditions as List of namedtuples.
     mapper : khmer_mapper.Mapper
     caller_kwargs : dict
+    score_threshold : float
+        Reads must score above this threshold to pass.
     Returns
     -------
     None
@@ -615,7 +627,7 @@ def simple_analysis_graph(
         unblock_batch_action_list = []
         stop_receiving_action_list = []
 
-        for read_info, read_id, seq_len, results in mapper.map_reads_2(
+        for read_info, read_id, seq_len, score in mapper.map_reads_2(
             caller.basecall_minknow(
                 reads=client.get_read_chunks(batch_size=batch_size, last=True),
                 signal_dtype=client.signal_dtype,
@@ -674,40 +686,11 @@ def simple_analysis_graph(
                 exceeded_threshold = True
 
             # No mappings
-            if not results:
+            if score <= score_threshold:
                 mode = "no_map"
-
-            hits = set()
-            for result in results:
-                pf.debug("{}\t{}\t{}".format(read_id, seq_len, result[1].r))
-                hits.add(result[0])
-
-            if hits & conditions[run_info[channel]].targets:
-                # Mappings and targets overlap, assume if mapping present then hits region of interest
-                coord_match = True
-                if len(hits) == 1:
-                    if coord_match:
-                        # Single match that is within coordinate range
-                        mode = "single_on"
-                    else:
-                        # Single match to a target outside coordinate range
-                        mode = "single_off"
-                elif len(hits) > 1:
-                    if coord_match:
-                        # Multiple matches with at least one in the correct region
-                        mode = "multi_on"
-                    else:
-                        # Multiple matches to targets outside the coordinate range
-                        mode = "multi_off"
-
-            else:
-                # No matches in mappings
-                if len(hits) > 1:
-                    # More than one, off-target, mapping
-                    mode = "multi_off"
-                elif len(hits) == 1:
-                    # Single off-target mapping
-                    mode = "single_off"
+            elif conditions[run_info[channel]].targets:
+                # can only detect single mapping to graph
+                mode = "single_on"
 
             # This is where we make our decision:
             # Get the associated action for this condition
@@ -725,12 +708,7 @@ def simple_analysis_graph(
             #  I think that this needs to change between enrichment and depletion
             # If under min_chunks AND any mapping mode seen we unblock
             # if below_threshold and mode in {"single_off", "multi_off"}:
-            if below_threshold and mode in {
-                "single_on",
-                "single_off",
-                "multi_on",
-                "multi_off",
-            }:
+            if below_threshold and mode == "single_on":
                 mode = "below_min_chunks_unblocked"
                 unblock_batch_action_list.append((channel, read_number, read_id))
                 decisiontracker.event_seen(decision_str)
@@ -898,6 +876,7 @@ def run(parser, args):
                     conditions=conditions,
                     mapper=mapper,
                     caller_kwargs=caller_kwargs,
+                    score_threshold=args.score_threshold
                 )
         except KeyboardInterrupt:
             pass
