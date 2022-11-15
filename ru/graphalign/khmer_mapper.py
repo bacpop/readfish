@@ -37,4 +37,4 @@ class Mapper:
         mapping_results : list
         """
         for read_info, read_id, seq, seq_len, quality in calls:
-            yield read_info, read_id, seq_len, list(align_long(self.index, self.mapper, seq))
+            yield read_info, read_id, seq_len, list(align_long(self.graph, self.mapper, seq))

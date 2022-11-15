@@ -524,8 +524,7 @@ def simple_analysis_graph(
 
     caller = Caller(
         address="{}/{}".format(caller_kwargs["host"], caller_kwargs["port"]),
-        config=caller_kwargs["config_name"],
-        align_ref=caller_kwargs["align_ref"],
+        config=caller_kwargs["config_name"]
     )
     # What if there is no reference or an empty MMI
 
@@ -593,7 +592,7 @@ def simple_analysis_graph(
                 )
 
                 # Update mapper client.
-                mapper = CustomMapper(new_reference)
+                mapper = GraphMapper(new_reference)
                 # Log on success
                 logger.info("Reloaded mapper")
 
@@ -822,14 +821,13 @@ def run(parser, args):
     )
     live_toml = Path("{}_live".format(args.toml))
 
-    if args.graph_align == "True":
-        mapper = GraphMapper(None)
+    logger.info("Initialising mapper")
+    if not args.graph_align:
+        mapper = CustomMapper(reference)
+        logger.info("Minimap initialised")
     else:
-        mapper = CustomMapper(None)
-    # Load Minimap2 index
-    # logger.info("Initialising minimap2 mapper")
-    # mapper = CustomMapper(reference)
-    # logger.info("Mapper initialised")
+        mapper = GraphMapper(reference)
+        logger.info("Khmer initialised")
 
     # send_message(
     #     read_until_client.connection,
