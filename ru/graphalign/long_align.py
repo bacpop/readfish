@@ -139,6 +139,26 @@ class GraphAlignment(object):
             if (a in '-=' or b in '-=' or a != b):
                 yield n, a, b
 
+    def soft_clip(self):
+        n = len(self.r)
+        m = n
+
+        # move through read forward, determine if start soft-clipped
+        for a in self.g:
+            if (a in '-='):
+                m -= 1
+            else:
+                break
+
+        # move through read backwards, determine if end soft-clipped
+        for a in self.g[::-1]:
+            if (a in '-='):
+                m -= 1
+            else:
+                break
+
+        return float(m/n)
+
     def variants(self):
         for n, (a, b) in enumerate(zip(self.g, self.r)):
             if a == '=':
@@ -339,7 +359,7 @@ def align_long(ct, aligner, sta):
         region_coords.append((last_seed, len(sta)))
 
     # start building piecewise alignments, anchored by seeds.
-    #alignments = []
+    alignments = []
     scores = []
 
     n = 0
@@ -347,7 +367,7 @@ def align_long(ct, aligner, sta):
         score, galign = align_segment_right(aligner, sta[start:end],
                                             next_ch=sta[end])
         scores.append(score)
-        #alignments.append(galign)
+        alignments.append(galign)
 
         n += 1
 
@@ -355,7 +375,7 @@ def align_long(ct, aligner, sta):
     (start, end) = region_coords[-1]
     score, galign = align_segment_right(aligner, sta[start:end])
 
-    #alignments.append(galign)
+    alignments.append(galign)
     scores.append(score)
 
     # deal with beginning, too: reverse align from first seed.
@@ -363,13 +383,16 @@ def align_long(ct, aligner, sta):
     score, galign = align_segment_left(aligner, leftend)
 
     galign = galign[:-1]  # trim off seed k-mer
-    #alignments.insert(0, galign)
+    alignments.insert(0, galign)
     scores.insert(0, score)
 
     # stitch all the alignments together
-    #final = stitch(alignments, K)
+    final = stitch(alignments, K)
 
-    return sum(scores)
+    # get % matches in alignment
+    clipped = final.soft_clip()
+
+    return clipped
 
 
 def find_highest_abund_kmer(ct, r):

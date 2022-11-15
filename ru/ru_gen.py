@@ -64,11 +64,19 @@ _cli = BASE_ARGS + (
         ),
     ),
     (
-        "--score_threshold",
+        "--align_threshold",
         dict(
-            help="Read score threshold",
-            default=0,
+            help="Read alignment threshold, based on soft-clipping of alignment start and end.",
+            default=1.0,
             type=float,
+        ),
+    ),
+    (
+        "--len_cutoff",
+        dict(
+            help="Reads below this length are allowed to fall below align_threshold, as may be too short to map.",
+            default=200,
+            type=int,
         ),
     ),
 )
@@ -470,7 +478,8 @@ def simple_analysis_graph(
     conditions=None,
     mapper=None,
     caller_kwargs=None,
-    score_threshold=0
+    align_threshold=1.0,
+    len_cutoff=200
 ):
     """Analysis function
     Parameters
@@ -500,8 +509,10 @@ def simple_analysis_graph(
         Experimental conditions as List of namedtuples.
     mapper : khmer_mapper.Mapper
     caller_kwargs : dict
-    score_threshold : float
-        Reads must score above this threshold to pass.
+    align_threshold : float
+        Reads must contain this proportion of non-clipped alignment or above.
+    len_cutoff : int
+        Reads shorter than this are allowed to fall below align_threshold and sequencing continued.
     Returns
     -------
     None
@@ -627,7 +638,7 @@ def simple_analysis_graph(
         unblock_batch_action_list = []
         stop_receiving_action_list = []
 
-        for read_info, read_id, seq_len, score in mapper.map_reads_2(
+        for read_info, read_id, seq_len, result in mapper.map_reads_2(
             caller.basecall_minknow(
                 reads=client.get_read_chunks(batch_size=batch_size, last=True),
                 signal_dtype=client.signal_dtype,
@@ -685,9 +696,13 @@ def simple_analysis_graph(
             ):
                 exceeded_threshold = True
 
-            # No mappings
-            if score <= score_threshold:
-                mode = "no_map"
+            # No mappings, assume does not map well
+            if result < align_threshold:
+                # if read is short, allow for further sequencing, otherwise reject
+                if seq_len < len_cutoff:
+                    mode = "no_map"
+                else:
+                    mode = "single_off"
             elif conditions[run_info[channel]].targets:
                 # can only detect single mapping to graph
                 mode = "single_on"
@@ -720,6 +735,7 @@ def simple_analysis_graph(
                 decisiontracker.event_seen(decision_str)
 
             log_decision()
+            #print("ID: {} Prop: {} Len: {} Mode: {}".format(read_id, result, seq_len, mode))
 
         client.unblock_read_batch(unblock_batch_action_list, duration=unblock_duration)
         client.stop_receiving_batch(stop_receiving_action_list)
@@ -876,7 +892,8 @@ def run(parser, args):
                     conditions=conditions,
                     mapper=mapper,
                     caller_kwargs=caller_kwargs,
-                    score_threshold=args.score_threshold
+                    align_threshold=args.align_threshold,
+                    len_cutoff=args.len_cutoff
                 )
         except KeyboardInterrupt:
             pass
