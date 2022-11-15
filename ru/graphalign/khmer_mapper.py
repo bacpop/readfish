@@ -15,11 +15,11 @@ class Mapper:
             self.initialised = False
 
     def map_read(self, seq):
-        return align_long(self.index, self.mapper, seq)
+        return align_long(self.graph, self.mapper, seq)
 
     def map_reads(self, calls):
         for read_id, seq in calls:
-            yield read_id, list(align_long(self.index, self.mapper, seq))
+            yield read_id, list(align_long(self.graph, self.mapper, seq))
 
     def map_reads_2(self, calls):
         """Align reads against a reference

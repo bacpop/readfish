@@ -655,8 +655,8 @@ def simple_analysis_graph(
 
             # parse generated data
             read_id = data["metadata"]["read_id"]
-            seq = data["datasets"]["sequence"],
-            seq_len = data["metadata"]["sequence_length"],
+            seq = data["datasets"]["sequence"]
+            seq_len = data["metadata"]["sequence_length"]
 
             channel, read_number = read_info
             if read_number not in tracker[channel]:
@@ -737,7 +737,10 @@ def simple_analysis_graph(
             #  I think that this needs to change between enrichment and depletion
             # If under min_chunks AND any mapping mode seen we unblock
             # if below_threshold and mode in {"single_off", "multi_off"}:
-            if below_threshold and mode == "single_on":
+            if below_threshold and mode in {
+                "single_on",
+                "single_off",
+            }:
                 mode = "below_min_chunks_unblocked"
                 unblock_batch_action_list.append((channel, read_number, read_id))
                 decisiontracker.event_seen(decision_str)
