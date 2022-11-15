@@ -338,8 +338,8 @@ def align_long(ct, aligner, sta):
         seed_pos = find_highest_abund_kmer(ct, region)
         seeds.append(start + seed_pos)
 
-    # if no seeds found, return
-    if not seeds:
+    # if less than two seeds found, return zero.
+    if len(seeds) < 2:
         return 0
 
     assert len(seeds) == len(set(seeds))
