@@ -66,7 +66,7 @@ _cli = BASE_ARGS + (
     (
         "--align_threshold",
         dict(
-            help="Read alignment threshold, based on soft-clipping of alignment start and end.",
+            help="Read alignment threshold, based on proportion of read matching graph.",
             default=1.0,
             type=float,
         ),
@@ -510,7 +510,7 @@ def simple_analysis_graph(
     mapper : khmer_mapper.Mapper
     caller_kwargs : dict
     align_threshold : float
-        Reads must contain this proportion of non-clipped alignment or above.
+        Reads must contain this proportion of aligned bases or above.
     len_cutoff : int
         Reads shorter than this are allowed to fall below align_threshold and sequencing continued.
     Returns
@@ -698,8 +698,9 @@ def simple_analysis_graph(
 
             # No mappings, assume does not map well
             if result < align_threshold:
-                # if read is short, allow for further sequencing, otherwise reject
-                if seq_len < len_cutoff:
+                # if read is short, allow for further sequencing, otherwise reject.
+                # If exact match required, always reject
+                if align_threshold < 1.0 and seq_len < len_cutoff:
                     mode = "no_map"
                 else:
                     mode = "single_off"
