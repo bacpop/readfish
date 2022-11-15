@@ -10,4 +10,4 @@ pandas
 mappy
 biopython==1.76
 minknow_api
-khmer>=2.1.1
+khmer==3.0.3a3
