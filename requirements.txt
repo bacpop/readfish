@@ -8,6 +8,6 @@ jsonschema
 watchdog
 pandas
 mappy
-biopython
+biopython==1.76
 minknow_api
-khmer>=3
+khmer>=2.1.1
