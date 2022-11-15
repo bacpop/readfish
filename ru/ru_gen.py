@@ -545,6 +545,7 @@ def simple_analysis_graph(
         fh.write("# In the future this file may become a CSV file.\n")
         toml.dump(d, fh)
 
+    logger.info(caller_kwargs)
     caller = Caller(
         address="{}/{}".format(caller_kwargs["host"], caller_kwargs["port"]),
         config=caller_kwargs["config_name"]
@@ -565,7 +566,6 @@ def simple_analysis_graph(
 
     # decided
     decided_reads = {}
-    strand_converter = {1: "+", -1: "-"}
 
     read_id = ""
 
@@ -596,7 +596,11 @@ def simple_analysis_graph(
 
     l_string = "\t".join(("{}" for _ in CHUNK_LOG_FIELDS))
     loop_counter = 0
+    # logger.info(">>>>>>> ONLY BASECALLING")
     while client.is_running:
+        if not client.is_phase_sequencing:
+            time.sleep(5)
+            continue
         if live_toml_path.is_file():
             # Reload the TOML config from the *_live file
             run_info, conditions, new_reference, _ = get_run_info(
@@ -628,9 +632,9 @@ def simple_analysis_graph(
 
         # TODO: Fix the logging to just one of the two in use
 
-        if not mapper.initialised:
-            time.sleep(throttle)
-            continue
+        # if not mapper.initialised:
+        #     time.sleep(throttle)
+        #     continue
 
         loop_counter += 1
         t0 = timer()
