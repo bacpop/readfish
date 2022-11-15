@@ -374,7 +374,6 @@ def align_long(ct, aligner, sta):
     # deal with end (no possibility of alignment from right)
     (start, end) = region_coords[-1]
     score, galign = align_segment_right(aligner, sta[start:end])
-    num_mismatches += galign.r.count("-") + galign.r.count("=")
 
     alignments.append(galign)
     #scores.append(score)
@@ -390,14 +389,10 @@ def align_long(ct, aligner, sta):
     # stitch all the alignments together
     final = stitch(alignments, K)
 
-    # matches in read alignment
-    g = final.g
+    # get % matches in alignment
+    clipped = final.soft_clip()
 
-    prop_match = len(g) - (g.count("-") + g.count("=")) / len(g)
-
-    # return proportion aligned within graph
-    return prop_match
-
+    return clipped
 
 def find_highest_abund_kmer(ct, r):
     pos = 0
