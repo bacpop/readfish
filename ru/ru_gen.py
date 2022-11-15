@@ -638,15 +638,26 @@ def simple_analysis_graph(
         unblock_batch_action_list = []
         stop_receiving_action_list = []
 
-        for read_info, read_id, seq_len, result in mapper.map_reads_2(
-            caller.basecall_minknow(
+        # for read_info, read_id, seq_len, result in mapper.map_reads_2(
+        #     caller.basecall_minknow(
+        #         reads=client.get_read_chunks(batch_size=batch_size, last=True),
+        #         signal_dtype=client.signal_dtype,
+        #         decided_reads=decided_reads,
+        #     )
+        # ):
+        for read_info, data in caller.get_all_data(
                 reads=client.get_read_chunks(batch_size=batch_size, last=True),
                 signal_dtype=client.signal_dtype,
                 decided_reads=decided_reads,
-            )
         ):
             r += 1
             read_start_time = timer()
+
+            # parse generated data
+            read_id = data["metadata"]["read_id"]
+            seq = data["datasets"]["sequence"],
+            seq_len = data["metadata"]["sequence_length"],
+
             channel, read_number = read_info
             if read_number not in tracker[channel]:
                 tracker[channel].clear()
@@ -695,6 +706,9 @@ def simple_analysis_graph(
                 >= conditions[run_info[channel]].max_chunks
             ):
                 exceeded_threshold = True
+
+            # generate mapping
+            result = mapper.map_read(seq)
 
             # No mappings, assume does not map well
             if result < align_threshold:
