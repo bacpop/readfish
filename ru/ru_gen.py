@@ -479,7 +479,7 @@ def simple_analysis_graph(
     mapper=None,
     caller_kwargs=None,
     align_threshold=1.0,
-    len_cutoff=200
+    len_cutoff=200,
 ):
     """Analysis function
     Parameters
@@ -548,7 +548,7 @@ def simple_analysis_graph(
     logger.info(caller_kwargs)
     caller = Caller(
         address="{}/{}".format(caller_kwargs["host"], caller_kwargs["port"]),
-        config=caller_kwargs["config_name"]
+        config=caller_kwargs["config_name"],
     )
     # What if there is no reference or an empty MMI
 
@@ -650,17 +650,18 @@ def simple_analysis_graph(
         #     )
         # ):
         for read_info, data in caller.get_all_data(
-                reads=client.get_read_chunks(batch_size=batch_size, last=True),
-                signal_dtype=client.signal_dtype,
-                decided_reads=decided_reads,
+            reads=client.get_read_chunks(batch_size=batch_size, last=True),
+            signal_dtype=client.signal_dtype,
+            decided_reads=decided_reads,
         ):
-            r += 1
-            read_start_time = timer()
 
             # parse generated data
             read_id = data["metadata"]["read_id"]
             seq = data["datasets"]["sequence"]
             seq_len = data["metadata"]["sequence_length"]
+
+            r += 1
+            read_start_time = timer()
 
             channel, read_number = read_info
             if read_number not in tracker[channel]:
@@ -756,7 +757,7 @@ def simple_analysis_graph(
                 decisiontracker.event_seen(decision_str)
 
             log_decision()
-            #print("ID: {} Prop: {} Len: {} Mode: {}".format(read_id, result, seq_len, mode))
+            #print("ID: {} Prop: {} Len: {} Decision: {}".format(read_id, result, seq_len, decision_str))
 
         client.unblock_read_batch(unblock_batch_action_list, duration=unblock_duration)
         client.stop_receiving_batch(stop_receiving_action_list)
@@ -861,9 +862,7 @@ def run(parser, args):
 
     """
     This experiment has N regions on the flowcell.
-
     using reference: /path/to/ref.mmi
-
     Region i:NAME (control=bool) has X targets of which Y are found in the reference.
     reads will be unblocked when [u,v], sequenced when [w,x] and polled for more data when [y,z].
     """
