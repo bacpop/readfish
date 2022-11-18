@@ -390,8 +390,8 @@ def align_long(ct, aligner, sta):
     final = stitch(alignments, K)
 
     # get % matches in alignment
-    mismatches, length = final.compare()
-    prop_id = (length - mismatches) / length
+    matches, length = final.compare()
+    prop_id = matches / length
 
     # get percentage of read in non-clipped alignment
     #clipped = final.soft_clip()

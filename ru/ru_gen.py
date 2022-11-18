@@ -66,7 +66,7 @@ _cli = BASE_ARGS + (
     (
         "--align_threshold",
         dict(
-            help="Read alignment threshold, based on soft-clipping of alignment start and end.",
+            help="Read alignment threshold, perc. identity of read to graph.",
             default=1.0,
             type=float,
         ),
@@ -75,7 +75,7 @@ _cli = BASE_ARGS + (
         "--len_cutoff",
         dict(
             help="Reads below this length are allowed to fall below align_threshold, as may be too short to map.",
-            default=200,
+            default=100,
             type=int,
         ),
     ),
@@ -510,7 +510,7 @@ def simple_analysis_graph(
     mapper : khmer_mapper.Mapper
     caller_kwargs : dict
     align_threshold : float
-        Reads must contain this proportion of non-clipped alignment or above.
+        Reads must align with the prop. identity or above.
     len_cutoff : int
         Reads shorter than this are allowed to fall below align_threshold and sequencing continued.
     Returns
