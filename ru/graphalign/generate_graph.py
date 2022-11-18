@@ -6,7 +6,7 @@ import argparse
 def get_options():
     description = 'Generates Khmer count graph in gfa format.'
     parser = argparse.ArgumentParser(description=description,
-                                     prog='python generate_graph.py')
+                                     prog='ru_generate_graph')
 
     IO = parser.add_argument_group('Input/Output options')
     IO.add_argument('--infile',

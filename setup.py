@@ -79,6 +79,7 @@ setup(
             "ru_iteralign_centrifuge={}.iteralign_centrifuge:main".format(MOD_NAME),
             "ru_unblock_all={}.unblock_all:main".format(MOD_NAME),
             "readfish={}.cli:main".format(MOD_NAME),
+            "ru_generate_graph={}.graphalign.generate_graph:main".format(MOD_NAME),
         ],
     },
     install_requires=install_requires,
