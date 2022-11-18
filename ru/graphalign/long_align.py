@@ -390,9 +390,13 @@ def align_long(ct, aligner, sta):
     final = stitch(alignments, K)
 
     # get % matches in alignment
-    clipped = final.soft_clip()
+    mismatches, length = final.compare()
+    prop_id = (length - mismatches) / length
 
-    return clipped
+    # get percentage of read in non-clipped alignment
+    #clipped = final.soft_clip()
+
+    return prop_id
 
 def find_highest_abund_kmer(ct, r):
     pos = 0
