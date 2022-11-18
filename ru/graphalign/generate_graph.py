@@ -21,8 +21,7 @@ def get_options():
                     type=int,
                     help='Kmer size (default=15). ')
     IO.add_argument('--maxtable',
-                    default=1e5,
-                    type=int,
+                    default="1e6",
                     help='Maximum khmer table size (default=1e6). ')
     IO.add_argument('--numtable',
                     default=4,
@@ -42,7 +41,7 @@ def main():
     threads = options.threads
     outpref = options.out
     kmer = options.kmer
-    maxtable = options.maxtable
+    maxtable = int(options.maxtable)
     numtable = options.numtable
 
     dataset = []
