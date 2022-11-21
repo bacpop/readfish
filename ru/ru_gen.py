@@ -715,6 +715,9 @@ def simple_analysis_graph(
             # generate mapping
             result = mapper.map_read(seq)
 
+            # add info to debug stream
+            pf.debug("{}\t{}\t{}".format(read_id, seq_len, result))
+
             # No mappings, assume does not map well
             if result < align_threshold:
                 # if read is short, allow for further sequencing, otherwise reject.
