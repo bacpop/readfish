@@ -718,16 +718,18 @@ def simple_analysis_graph(
             # add info to debug stream
             pf.debug("{}\t{}\t{}".format(read_id, seq_len, result))
 
-            # No mappings, assume does not map well
-            if result < align_threshold:
-                # if read is short, allow for further sequencing, otherwise reject.
-                if seq_len < len_cutoff:
-                    mode = "no_map"
+            # only concerned with reads in target channels
+            if conditions[run_info[channel]].targets:
+                # No mappings, assume does not map well
+                if result < align_threshold:
+                    # if read is short, allow for further sequencing, otherwise reject.
+                    if seq_len < len_cutoff:
+                        mode = "no_map"
+                    else:
+                        mode = "single_off"
                 else:
-                    mode = "single_off"
-            elif conditions[run_info[channel]].targets:
-                # can only detect single mapping to graph
-                mode = "single_on"
+                    # can only detect single mapping to graph
+                    mode = "single_on"
 
             # This is where we make our decision:
             # Get the associated action for this condition
