@@ -17,14 +17,14 @@ def get_options():
                     type=str,
                     help='Output prefix for gfa file. ')
     IO.add_argument('--kmer',
-                    default=31,
+                    default=11,
                     type=int,
-                    help='Kmer size (default=31). ')
+                    help='Kmer size (default=11). ')
     IO.add_argument('--maxtable',
-                    default=1000000,
+                    default=4000000000,
                     type=int,
                     help='Maximum khmer table size. This should be adjusted to ensure '
-                         'maxtable * numtable > no. unique kmers (default=1e6). ')
+                         'maxtable * numtable > no. unique kmers (default=4e9, good for bacterial genomes). ')
     IO.add_argument('--numtable',
                     default=4,
                     type=int,
