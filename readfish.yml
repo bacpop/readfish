@@ -7,6 +7,7 @@ dependencies:
   - python=3.8
   - pybind11
   - bifrost
+  - cmake>=3.10
   - zlib
   - pthread-stubs
   - pip
@@ -14,5 +15,5 @@ dependencies:
     - read-until==v3.0.0
     - git+https://git@github.com/samhorsfield96/readfish@graph_alignment_bifrost
     - ont-pyguppy-client-lib==6.3.8
-    - git+https://git@github.com/nanoporetect/minknow_api@5.3.0#subdirectory=python
+    - git+https://git@github.com/nanoporetech/minknow_api.git@5.3.0#subdirectory=python
 

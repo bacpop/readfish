@@ -58,11 +58,9 @@ class Graph {
                const std::string& outpref);
 
     // read existing graph and index
-    void read(const std::string& graphfile,
-              size_t num_threads);
+    void read(const std::string& graphfile);
 
-    double query(const std::string& query,
-                 size_t num_threads);
+    double query(const std::string& query);
 
     // clear graph object
     void clear() {_cdbg.clear();};

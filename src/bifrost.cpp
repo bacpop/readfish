@@ -65,9 +65,6 @@ void Graph::build (const std::string& infile1,
     // read in compact coloured DBG
     cout << "Building coloured compacted DBG..." << endl;
 
-    // set OMP number of threads
-    omp_set_num_threads(num_threads);
-
     // initialise persistent variables
     int overlap = kmer - 1;
 
@@ -84,24 +81,12 @@ void Graph::build (const std::string& infile1,
 
 // read existing graph and index
 void Graph::read (const std::string& graphfile) {
-
-    // read in compact coloured DBG
-    //cout << "Reading coloured compacted DBG..." << endl;
-
     // read in graph
     _cdbg.read(graphfile);
     _kmer = _cdbg.getK();
-
-    //cout << "Graph read, k=" << _kmer << endl;
 }
 
-double Graph::query (const std::string& query,
-                     size_t num_threads) {
-    // Set number of threads
-    if (num_threads < 1)
-    {
-        num_threads = 1;
-    }
+double Graph::query (const std::string& query) {
 
     // hold number of kmers
     const size_t num_kmers = query.length() - _kmer + 1;
@@ -121,6 +106,6 @@ double Graph::query (const std::string& query,
 
     double prop_match = (double)total_matches / (double)num_kmers;
 
-    return prop_match
+    return prop_match;
 }
 
