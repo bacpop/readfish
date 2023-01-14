@@ -10,6 +10,9 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
+// global variable declaration
+namespace py = pybind11;
+
 class Graph {
     public:
 //    // constructors for debugging
