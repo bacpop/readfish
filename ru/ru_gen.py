@@ -18,7 +18,7 @@ import toml
 
 from ru.arguments import BASE_ARGS
 from ru.basecall import Mapper as CustomMapper
-from ru.graphalign.khmer_mapper import Mapper as GraphMapper
+from ru.graphalign.bifrost_mapper import Mapper as GraphMapper
 from ru.basecall import GuppyCaller as Caller
 from ru.utils import (
     print_args,
@@ -509,7 +509,7 @@ def simple_analysis_graph(
         Dictionary of {channel: index} where index corresponds to an index in `conditions`
     conditions : list
         Experimental conditions as List of namedtuples.
-    mapper : khmer_mapper.Mapper
+    mapper : bifrost_mapper.Mapper
     caller_kwargs : dict
     align_threshold : float
         Reads must align with the prop. identity or above.
@@ -850,7 +850,7 @@ def run(parser, args):
         logger.info("Minimap initialised")
     else:
         mapper = GraphMapper(reference)
-        logger.info("Khmer initialised")
+        logger.info("Bifrost initialised")
 
     # send_message(
     #     read_until_client.connection,

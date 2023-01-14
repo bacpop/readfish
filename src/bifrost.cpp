@@ -83,23 +83,16 @@ void Graph::build (const std::string& infile1,
 }
 
 // read existing graph and index
-void Graph::read (const std::string& graphfile,
-                  size_t num_threads) {
-
-    // Set number of threads
-    if (num_threads < 1)
-    {
-        num_threads = 1;
-    }
+void Graph::read (const std::string& graphfile) {
 
     // read in compact coloured DBG
-    cout << "Reading coloured compacted DBG..." << endl;
+    //cout << "Reading coloured compacted DBG..." << endl;
 
     // read in graph
-    _cdbg.read(graphfile, num_threads);
+    _cdbg.read(graphfile);
     _kmer = _cdbg.getK();
 
-    cout << "Graph read, k=" << _kmer << endl;
+    //cout << "Graph read, k=" << _kmer << endl;
 }
 
 double Graph::query (const std::string& query,
