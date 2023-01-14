@@ -1,3 +1,6 @@
+#ifndef BIFROST_H
+#define BIFROST_H
+
 #include <bifrost/CompactedDBG.hpp>
 
 class Graph {
@@ -78,3 +81,4 @@ CompactedDBG<> buildGraph (const std::string& infile_1,
                           const int threads,
                           const std::string& output_prefix);
 
+#endif //BIFROST_H

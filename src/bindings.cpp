@@ -1,6 +1,6 @@
 #include "bindings.h"
 
-PYBIND11_MODULE(unitig_query, m) {
+PYBIND11_MODULE(query_cpp, m) {
   m.doc() = "Finds strings in bifrost DBG";
 
   py::class_<Graph, std::unique_ptr<Graph>>(m, "Graph")
