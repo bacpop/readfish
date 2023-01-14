@@ -34,4 +34,4 @@ SET( bifrost_INCLUDE_DIRS ${bifrost_INCLUDE_DIR} )
 SET( bifrost_LIBRARIES ${bifrost_LIBRARY} )
 
 # link libraries
-target_link_libraries(query_cpp PRIVATE ${bifrost_LIBRARIES ${z_LIBRARIES} Threads::Threads)
+target_link_libraries(query_cpp PRIVATE ${bifrost_LIBRARIES} ${z_LIBRARIES} Threads::Threads)
