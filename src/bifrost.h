@@ -71,7 +71,7 @@ class Graph {
     int _kmer;
 };
 
-ColoredCDBG<> buildGraph (const std::string& infile_1,
+CompactedDBG<> buildGraph (const std::string& infile_1,
                           const std::string& infile_2,
                           const bool is_ref,
                           const int kmer,

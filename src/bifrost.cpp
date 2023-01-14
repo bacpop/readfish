@@ -1,6 +1,6 @@
 #include "bifrost.h"
 
-ColoredCDBG<> buildGraph (const std::string& infile_1,
+CompactedDBG<> buildGraph (const std::string& infile_1,
                           const std::string& infile_2,
                           const bool is_ref,
                           const int kmer,
@@ -40,10 +40,9 @@ ColoredCDBG<> buildGraph (const std::string& infile_1,
         }
     }
 
-    ColoredCDBG<> cdbg(opt.k);
+    CompactedDBG<> cdbg(opt.k);
     cdbg.buildGraph(opt);
     cdbg.simplify(opt.deleteIsolated, opt.clipTips, opt.verbose);
-    cdbg.buildColors(opt);
 
     cdbg.write(opt.prefixFilenameOut, opt.nb_threads, opt.verbose);
 
@@ -62,8 +61,8 @@ void Graph::build (const std::string& infile1,
         num_threads = 1;
     }
 
-    // read in compact coloured DBG
-    cout << "Building coloured compacted DBG..." << endl;
+    // read in compact DBG
+    cout << "Building compacted DBG..." << endl;
 
     // initialise persistent variables
     int overlap = kmer - 1;
