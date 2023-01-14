@@ -16,13 +16,7 @@ pybind11_add_module(query_cpp src/bindings.cpp src/bifrost.cpp)
 IF( DEFINED ENV{CONDA_PREFIX} )
   # set conda directory
   SET(CONDA_DIR "$ENV{CONDA_PREFIX}")
-  SET(Protobuf_PROTOC_EXECUTABLE ${CONDA_DIR}/bin/protoc)
 ENDIF()
-
-# find correct protobuf library
-FIND_LIBRARY(Protobuf_LIBRARY NAMES protobuf HINTS ${CONDA_DIR}/lib REQUIRED)
-FIND_LIBRARY(Protobuf_PROTOC_LIBRARY NAMES protoc HINTS ${CONDA_DIR}/lib REQUIRED)
-FIND_PATH(Protobuf_INCLUDE_DIR zlib.h HINTS ${CONDA_DIR}/include)
 
 include(FindPackageHandleStandardArgs)
 #Find zlib
