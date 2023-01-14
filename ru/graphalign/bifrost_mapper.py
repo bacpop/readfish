@@ -4,18 +4,18 @@ class Mapper:
     def __init__(self, index):
         self.index = index
         if self.index:
-            self.graph = query_cpp.Graph().read(index)
+            self.mapper = query_cpp.Graph().read(index)
             self.initialised = True
         else:
-            self.graph = None
+            self.mapper = None
             self.initialised = False
 
     def map_read(self, seq):
-        return self.graph.query(seq)
+        return self.mapper.query(seq)
 
     def map_reads(self, calls):
         for read_id, seq in calls:
-            yield read_id, list(self.graph.query(seq))
+            yield read_id, list(self.mapper.query(seq))
 
     def map_reads_2(self, calls):
         """Align reads against a reference
@@ -33,4 +33,4 @@ class Mapper:
         mapping_results : list
         """
         for read_info, read_id, seq, seq_len, quality in calls:
-            yield read_info, read_id, seq_len, self.graph.query(seq)
+            yield read_info, read_id, seq_len, self.mapper.query(seq)

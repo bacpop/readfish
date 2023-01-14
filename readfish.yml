@@ -5,7 +5,7 @@ channels:
   - defaults
 dependencies:
   - python=3.8
-  - pybind
+  - pybind11
   - bifrost
   - zlib
   - pthread-stubs
