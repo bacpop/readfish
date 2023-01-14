@@ -1,6 +1,9 @@
 #ifndef BIFROST_H
 #define BIFROST_H
 
+#include <string>
+#include <iostream>
+#include <sstream>
 #include <bifrost/CompactedDBG.hpp>
 
 class Graph {
@@ -64,9 +67,6 @@ class Graph {
     void read(const std::string& graphfile);
 
     double query(const std::string& query);
-
-    // clear graph object
-    void clear() {_cdbg.clear();};
 
     private:
     // stored bifrost DBG

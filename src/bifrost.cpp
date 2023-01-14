@@ -53,7 +53,7 @@ void Graph::build (const std::string& infile1,
                    const int kmer,
                    size_t num_threads,
                    bool is_ref,
-                   const std::string& infile2
+                   const std::string& infile2,
                    const std::string& outpref) {
     // Set number of threads
     if (num_threads < 1)
