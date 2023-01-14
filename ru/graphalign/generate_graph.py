@@ -1,17 +1,19 @@
-import khmer
-from khmer import khmer_args
-from oxli.functions import build_graph
 import argparse
+import query_cpp
+import sys
 
 def get_options():
-    description = 'Generates Khmer count graph in gfa format.'
+    description = 'Generates Bifrost graph in gfa format.'
     parser = argparse.ArgumentParser(description=description,
                                      prog='ru_generate_graph')
 
     IO = parser.add_argument_group('Input/Output options')
-    IO.add_argument('--infile',
-                    required=True,
-                    help='List of files paths to fasta files to generate gfa from, one per line. ')
+    IO.add_argument('--refs',
+                    default=None,
+                    help='List of files paths to assembly fasta files to generate gfa from, one per line. ')
+    IO.add_argument('--reads',
+                    default=None,
+                    help='List of files paths to reads fasta files to generate gfa from, one per line. ')
     IO.add_argument('--out',
                     default="reference",
                     type=str,
@@ -20,15 +22,6 @@ def get_options():
                     default=11,
                     type=int,
                     help='Kmer size (default=11). ')
-    IO.add_argument('--maxtable',
-                    default=4000000000,
-                    type=int,
-                    help='Maximum khmer table size. This should be adjusted to ensure '
-                         'maxtable * numtable > no. unique kmers (default=4e9, good for bacterial genomes). ')
-    IO.add_argument('--numtable',
-                    default=4,
-                    type=int,
-                    help='Number of khmer tables (default=4). ')
     IO.add_argument('--threads',
                     default=1,
                     type=int,
@@ -39,24 +32,31 @@ def get_options():
 def main():
     options = get_options()
 
-    infile = options.infile
+    refs = options.refs
+    reads = options.refs
     threads = options.threads
-    outpref = options.out
+    out = options.out
     kmer = options.kmer
-    maxtable = options.maxtable
-    numtable = options.numtable
 
-    dataset = []
+    graph = query_cpp.Graph()
 
-    with open(infile, "r") as f:
-        for line in f:
-            dataset.append(line.strip())
+    # if refs file specified for building
+    if (refs is not None) and (reads is None):
+        graph.build(refs, kmer, threads, True, "NA", out)
+    # if reads file specified for building
+    elif (refs is None) and (reads is not None):
+        graph.build(reads, kmer, threads, False, "NA", out)
+    # if both reads and refs file specified for building
+    elif (refs is not None) and (reads is not None):
+        graph.build(refs, kmer, threads, False, reads, out)
+    else:
+        print("Error: incorrect number of input files specified. Please only specify the below combinations:\n"
+              "- List of assembly files to '--refs'.\n"
+              "- List of read files to '--reads'.\n"
+              "- A list of reference files and a list of read files to '--refs' and '--reads' respectively.")
+        sys.exit(1)
 
-    countgraph = khmer.Countgraph(kmer, maxtable, numtable)
-
-    build_graph(dataset, countgraph, num_threads=threads)
-
-    countgraph.save(outpref + ".khmer")
+    sys.exit(0)
 
 if __name__ == "__main__":
     main()
