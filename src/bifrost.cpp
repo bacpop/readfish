@@ -41,10 +41,10 @@ CompactedDBG<> buildGraph (const std::string& infile_1,
     }
 
     CompactedDBG<> cdbg(opt.k);
-    cdbg.buildGraph(opt);
+    cdbg.build(opt);
     cdbg.simplify(opt.deleteIsolated, opt.clipTips, opt.verbose);
 
-    cdbg.write(opt.prefixFilenameOut, opt.nb_threads, opt.verbose);
+    cdbg.write(opt.prefixFilenameOut, opt.nb_threads);
 
     return cdbg;
 }
