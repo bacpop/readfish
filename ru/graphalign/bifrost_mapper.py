@@ -4,7 +4,8 @@ class Mapper:
     def __init__(self, index):
         self.index = index
         if self.index:
-            self.mapper = query_cpp.Graph().read(index)
+            self.mapper = query_cpp.Graph()
+            self.mapper.read(index)
             self.initialised = True
         else:
             self.mapper = None
