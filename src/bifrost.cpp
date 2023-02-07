@@ -83,6 +83,7 @@ void Graph::read (const std::string& graphfile) {
     // read in graph
     _cdbg.read(graphfile);
     _kmer = _cdbg.getK();
+    _kmerd = (double)_kmer;
 }
 
 double Graph::query (const std::string& query, const int gap) {
@@ -91,6 +92,7 @@ double Graph::query (const std::string& query, const int gap) {
     const size_t num_kmers = query.length() - _kmer + 1;
     const size_t num_split_kmers = num_kmers - (_kmer + gap);
     int total_matches = 0;
+    int total_mismatches = 0;
 
     // convert query to string for search in graph
     const char *query_str = query.c_str();
@@ -114,12 +116,26 @@ double Graph::query (const std::string& query, const int gap) {
         if (match_vec[ind1] && match_vec[ind2])
         {
             total_matches++;
+        } else
+        {
+            // add two to take into account mismatch in query and graph
+            total_mismatches += 2;
         }
         ind1++;
     }
 
-    double prop_match = (double)total_matches / (double)num_split_kmers;
+    // calcaulte jaccard index
+    double jaccard = (double)total_matches / (double)(total_matches + total_mismatches);
 
-    return prop_match;
+    // calculate mash distance, https://mash.readthedocs.io/en/latest/distances.html and https://www.biorxiv.org/content/10.1101/453142v1.full.pdf
+    double mash_sim = 0;
+    if (jaccard > 0)
+    {
+        double param1 = (-1/((2 * _kmerd) + gap));
+        double param2 = log((2 * jaccard) / (1 + jaccard));
+        mash_sim = 1 - (param1 * param2);
+    }
+
+    return mash_sim;
 }
 

@@ -6,6 +6,7 @@
 #include <sstream>
 #include <bifrost/CompactedDBG.hpp>
 #include <vector>
+#include <math.h>
 
 // pybind11 headers
 #include <pybind11/pybind11.h>
@@ -80,6 +81,7 @@ class Graph {
     // stored bifrost DBG
     CompactedDBG<> _cdbg;
     int _kmer;
+    double _kmerd;
 };
 
 CompactedDBG<> buildGraph (const std::string& infile_1,
