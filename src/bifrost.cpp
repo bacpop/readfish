@@ -85,25 +85,40 @@ void Graph::read (const std::string& graphfile) {
     _kmer = _cdbg.getK();
 }
 
-double Graph::query (const std::string& query) {
+double Graph::query (const std::string& query, const int gap) {
 
     // hold number of kmers
     const size_t num_kmers = query.length() - _kmer + 1;
+    const size_t num_split_kmers = num_kmers - (_kmer + gap);
     int total_matches = 0;
 
     // convert query to string for search in graph
     const char *query_str = query.c_str();
 
+    std::vector<bool> match_vec;
+
     for (KmerIterator it_km(query_str), it_km_end; it_km != it_km_end; ++it_km)
     {
+        // count all matches
         auto um = _cdbg.find(it_km->first);
-        if (!um.isEmpty)
+        match_vec.push_back(!um.isEmpty);
+    }
+
+    // iterate over matches, linking split-kmers
+    int ind1 = 0;
+    int ind2 = ind1 + _kmer + gap;
+
+    // iterate over all split-kmers
+    for (; ind2 < num_kmers; ind2++)
+    {
+        if (match_vec[ind1] && match_vec[ind2])
         {
             total_matches++;
         }
+        ind1++;
     }
 
-    double prop_match = (double)total_matches / (double)num_kmers;
+    double prop_match = (double)total_matches / (double)num_split_kmers;
 
     return prop_match;
 }

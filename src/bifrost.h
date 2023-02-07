@@ -5,6 +5,7 @@
 #include <iostream>
 #include <sstream>
 #include <bifrost/CompactedDBG.hpp>
+#include <vector>
 
 // pybind11 headers
 #include <pybind11/pybind11.h>
@@ -73,7 +74,7 @@ class Graph {
     // read existing graph and index
     void read(const std::string& graphfile);
 
-    double query(const std::string& query);
+    double query(const std::string& query, const int gap);
 
     private:
     // stored bifrost DBG
