@@ -73,15 +73,6 @@ _cli = BASE_ARGS + (
         ),
     ),
     (
-        "--gap",
-        dict(
-            help="Split k-mer gap."
-                 "Default = 1",
-            default=1,
-            type=int,
-        ),
-    ),
-    (
         "--len_cutoff",
         dict(
             help="Reads below this length are allowed to fall below align_threshold, as may be too short to map."
@@ -491,7 +482,6 @@ def simple_analysis_graph(
     caller_kwargs=None,
     align_threshold=1.0,
     len_cutoff=200,
-    gap=1,
 ):
     """Analysis function
     Parameters
@@ -525,8 +515,6 @@ def simple_analysis_graph(
         Reads must align with the prop. identity or above.
     len_cutoff : int
         Reads shorter than this are allowed to fall below align_threshold and sequencing continued.
-    gap : int
-        Gap for split-kmer matching.
     Returns
     -------
     None
@@ -727,7 +715,7 @@ def simple_analysis_graph(
                 exceeded_threshold = True
 
             # generate mapping
-            result = mapper.map_read(seq, gap)
+            result = mapper.map_read(seq)
 
             # add info to debug stream
             pf.debug("{}\t{}\t{}".format(read_id, seq_len, result))
@@ -932,8 +920,7 @@ def run(parser, args):
                     mapper=mapper,
                     caller_kwargs=caller_kwargs,
                     align_threshold=args.align_threshold,
-                    len_cutoff=args.len_cutoff,
-                    gap=args.gap
+                    len_cutoff=args.len_cutoff
                 )
         except KeyboardInterrupt:
             pass

@@ -11,14 +11,14 @@ class Mapper:
             self.mapper = None
             self.initialised = False
 
-    def map_read(self, seq, gap):
-        return self.mapper.query(seq, gap)
+    def map_read(self, seq):
+        return self.mapper.query(seq)
 
-    def map_reads(self, calls, gap):
+    def map_reads(self, calls):
         for read_id, seq in calls:
-            yield read_id, list(self.mapper.query(seq, gap))
+            yield read_id, list(self.mapper.query(seq))
 
-    def map_reads_2(self, calls, gap):
+    def map_reads_2(self, calls):
         """Align reads against a reference
         Parameters
         ----------
@@ -34,4 +34,4 @@ class Mapper:
         mapping_results : list
         """
         for read_info, read_id, seq, seq_len, quality in calls:
-            yield read_info, read_id, seq_len, self.mapper.query(seq, gap)
+            yield read_info, read_id, seq_len, self.mapper.query(seq)

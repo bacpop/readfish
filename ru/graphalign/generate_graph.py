@@ -22,6 +22,10 @@ def get_options():
                     default=11,
                     type=int,
                     help='Kmer size (default=11). ')
+    IO.add_argument('--gap',
+                    default=1,
+                    type=int,
+                    help='Gap size for split-kmers (default=1). ')
     IO.add_argument('--threads',
                     default=1,
                     type=int,
@@ -37,6 +41,7 @@ def main():
     threads = options.threads
     out = options.out
     kmer = options.kmer
+    gap = options.gap
 
     graph = query_cpp.Graph()
 
@@ -48,7 +53,7 @@ def main():
         graph.build(reads, kmer, threads, False, "NA", out)
     # if both reads and refs file specified for building
     elif (refs is not None) and (reads is not None):
-        graph.build(refs, kmer, threads, False, reads, out)
+        graph.build(refs, kmer, gap, threads, False, reads, out)
     else:
         print("Error: incorrect number of input files specified. Please only specify the below combinations:\n"
               "- List of assembly files to '--refs'.\n"
