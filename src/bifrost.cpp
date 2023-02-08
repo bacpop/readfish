@@ -440,7 +440,7 @@ double Graph::query (const std::string& query) {
     double mash_sim = 0;
     if (jaccard > 0)
     {
-        double param1 = (-1/((2 * _kmerd) + _gap));
+        double param1 = (-1/((2 * _kmerd) + (double)_gap));
         double param2 = log((2 * jaccard) / (1 + jaccard));
         mash_sim = 1 - (param1 * param2);
     }
