@@ -8,6 +8,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
 # find packages with cmake methods
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
+find_package(Boost REQUIRED system serialization)
 
 # find pybind and create python module
 find_package(pybind11 REQUIRED)
@@ -35,3 +36,9 @@ SET( bifrost_LIBRARIES ${bifrost_LIBRARY} )
 
 # link libraries
 target_link_libraries(query_cpp PRIVATE ${bifrost_LIBRARIES} ${z_LIBRARIES} Threads::Threads)
+
+find_package(OpenMP)
+if(OpenMP_CXX_FOUND)
+    target_link_libraries(DBG_alignment PRIVATE OpenMP::OpenMP_CXX)
+    MESSAGE("Found openmp")
+endif()

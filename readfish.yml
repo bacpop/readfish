@@ -7,6 +7,8 @@ dependencies:
   - python=3.8
   - pybind11
   - bifrost
+  - boost-cpp
+  - openmp
   - cmake>=3.10
   - zlib
   - pthread-stubs
