@@ -8,7 +8,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
 # find packages with cmake methods
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
-find_package(Boost REQUIRED system serialization)
 
 # find pybind and create python module
 find_package(pybind11 REQUIRED)
@@ -34,11 +33,18 @@ FIND_PACKAGE_HANDLE_STANDARD_ARGS(bifrost DEFAULT_MSG bifrost_INCLUDE_DIR bifros
 SET( bifrost_INCLUDE_DIRS ${bifrost_INCLUDE_DIR} )
 SET( bifrost_LIBRARIES ${bifrost_LIBRARY} )
 
+target_include_directories(query_cpp PRIVATE include)
+
 # link libraries
 target_link_libraries(query_cpp PRIVATE ${bifrost_LIBRARIES} ${z_LIBRARIES} Threads::Threads)
 
-find_package(OpenMP)
-if(OpenMP_CXX_FOUND)
-    target_link_libraries(DBG_alignment PRIVATE OpenMP::OpenMP_CXX)
-    MESSAGE("Found openmp")
+# find openmp
+if(DEFINED ENV{CONDA_PREFIX} AND (NOT APPLE OR CMAKE_COMPILER_IS_GNUCC))
+    target_link_libraries(ggCaller_cpp PRIVATE gomp)
+else()
+    find_package(OpenMP)
+    if(OpenMP_CXX_FOUND)
+        target_link_libraries(ggCaller_cpp PRIVATE OpenMP::OpenMP_CXX)
+        MESSAGE("Found openmp")
+    endif()
 endif()

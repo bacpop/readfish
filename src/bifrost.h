@@ -14,15 +14,12 @@
 // openmp
 #include <omp.h>
 
-// boost serialising headers
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
-#include <boost/serialization/vector.hpp>
-#include <boost/serialization/utility.hpp>
-#include <boost/dynamic_bitset/serialization.hpp>
-#include <boost/serialization/unordered_map.hpp>
-#include <boost/serialization/unordered_set.hpp>
-#include "serialize_tuple.h"
+// cereal serialising headers
+#include <cereal/archives/binary.hpp>
+#include <cereal/types/unordered_map.hpp>
+#include <cereal/types/unordered_set.hpp>
+#include <cereal/types/tuple.hpp>
+#include <cereal/types/string.hpp>
 
 // pybind11 headers
 #include <pybind11/pybind11.h>
@@ -41,7 +38,7 @@ typedef std::vector<std::vector<std::pair<Kmer, bool>>> PathVec;
 typedef std::tuple<int, Kmer, bool, size_t> PathTuple;
 
 class Graph {
-    public:
+public:
 //    // constructors for debugging
 //    // default constructor
 //    Graph()
@@ -90,30 +87,38 @@ class Graph {
 //    };
 
     // build new bifrost graph and index
-    void build(const std::string& infile1,
+    void build(const std::string &infile1,
                const size_t kmer,
                const size_t gap,
                size_t num_threads,
                bool is_ref,
-               const std::string& infile2,
-               const std::string& outpref);
+               const std::string &infile2,
+               const std::string &outpref);
 
     // read existing graph and index
-    void read(const std::string& sk_index);
+    void read(const std::string &sk_index);
 
-    double query(const std::string& query);
+    double query(const std::string &query);
 
-    private:
+private:
     // stored bifrost DBG
     CompactedDBG<> _cdbg;
     size_t _kmer;
     size_t _gap;
+    double _gapd;
     double _kmerd;
 
     KmerMap _kmermap;
 
     void index_split_kmer();
-    void read_skindex(const std::string& sk_index);
+
+    void read_skindex(const std::string &sk_index);
+
+    template<class Archive>
+    void serialize(Archive & archive)
+    {
+        archive(_gap, _kmer, _kmermap);
+    };
 };
 
 CompactedDBG<> buildGraph (const std::string& infile_1,

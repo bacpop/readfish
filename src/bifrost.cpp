@@ -357,10 +357,10 @@ void Graph::build (const std::string& infile1,
     // write sk_index
     std::tuple<int, int, KmerMap> for_writing = {_gap, _kmer, _kmermap};
 
-    std::ofstream ofs(outpref + ".sk");
-    boost::archive::text_oarchive oa(ofs);
+    std::ofstream os(outpref + ".sk", std::ios::binary);
+    cereal::BinaryOutputArchive oarchive(os);
     // write class instance to archive
-    oa << for_writing;
+    oarchive(for_writing);
 
     cout << "Split-kmer index written to " << outpref << ".sk" << endl;
 }
@@ -369,11 +369,12 @@ void Graph::read_skindex(const std::string& sk_index)
 {
     std::tuple<int, int, KmerMap> for_writing;
 
-    std::ifstream ifs(sk_index);
-    boost::archive::text_iarchive ia(ifs);
-    ia >> for_writing;
+    std::ifstream is(sk_index, std::ios::binary);
+    cereal::BinaryInputArchive iarchive(is);
+    iarchive(for_writing);
 
     _gap = std::get<0>(for_writing);
+    _gapd = (double)_gap;
     _kmer = std::get<1>(for_writing);
     _kmerd = (double)_kmer;
     _kmermap = std::get<2>(for_writing);
@@ -440,7 +441,7 @@ double Graph::query (const std::string& query) {
     double mash_sim = 0;
     if (jaccard > 0)
     {
-        double param1 = (-1/((2 * _kmerd) + (double)_gap));
+        double param1 = (-1/((2 * _kmerd) + _gapd));
         double param2 = log((2 * jaccard) / (1 + jaccard));
         mash_sim = 1 - (param1 * param2);
     }
