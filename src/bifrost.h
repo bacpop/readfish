@@ -10,6 +10,7 @@
 #include <unordered_set>
 #include <unordered_map>
 #include <stack>
+#include <progressbar.h>
 
 // openmp
 #include <omp.h>

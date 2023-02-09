@@ -311,6 +311,13 @@ void Graph::index_split_kmer()
         head_kmer_arr.push_back(um.getUnitigHead());
     }
 
+    // set up progress bar
+    progressbar bar(head_kmer_arr.size());
+    bar.set_todo_char(" ");
+    bar.set_done_char("█");
+    bar.set_opening_bracket_char("|");
+    bar.set_closing_bracket_char("|");
+
     // reiterate, use openMP
     #pragma omp parallel
     {
@@ -319,13 +326,17 @@ void Graph::index_split_kmer()
         for (auto it = head_kmer_arr.begin(); it < head_kmer_arr.end(); it++)
         {
             kmer_map_temp.merge(traverse_unitig(_cdbg, *it, length, overlap));
-        }
-
-        #pragma omp critical
-        {
-            _kmermap.merge(kmer_map_temp);
+            // update progress bar
+            #pragma omp critical
+            {
+                bar.update();
+                _kmermap.merge(kmer_map_temp);
+            }
         }
     }
+
+    // add new line to account for progress bar
+    cout << endl;
 }
 
 void Graph::build (const std::string& infile1,
