@@ -30,6 +30,10 @@ def get_options():
                     default=1,
                     type=int,
                     help='Number of threads (default=1). ')
+    IO.add_argument('--splitkmer',
+                    action="store_true",
+                    default=False,
+                    help='Use split-kmers. Note: Index generation will take a long time (default=False). ')
 
     return parser.parse_args()
 
@@ -42,18 +46,19 @@ def main():
     out = options.out
     kmer = options.kmer
     gap = options.gap
+    splitk = options.splitkmer
 
     graph = query_cpp.Graph()
 
     # if refs file specified for building
     if (refs is not None) and (reads is None):
-        graph.build(refs, kmer, threads, True, "NA", out)
+        graph.build(refs, kmer, threads, True, "NA", out, splitk)
     # if reads file specified for building
     elif (refs is None) and (reads is not None):
-        graph.build(reads, kmer, threads, False, "NA", out)
+        graph.build(reads, kmer, threads, False, "NA", out, splitk)
     # if both reads and refs file specified for building
     elif (refs is not None) and (reads is not None):
-        graph.build(refs, kmer, gap, threads, False, reads, out)
+        graph.build(refs, kmer, gap, threads, False, reads, out, splitk)
     else:
         print("Error: incorrect number of input files specified. Please only specify the below combinations:\n"
               "- List of assembly files to '--refs'.\n"

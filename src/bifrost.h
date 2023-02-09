@@ -94,10 +94,11 @@ public:
                size_t num_threads,
                bool is_ref,
                const std::string &infile2,
-               const std::string &outpref);
+               const std::string &outpref,
+               const bool splitk);
 
     // read existing graph and index
-    void read(const std::string &sk_index);
+    void read(const std::string &infile);
 
     double query(const std::string &query);
 
@@ -108,6 +109,8 @@ private:
     size_t _gap;
     double _gapd;
     double _kmerd;
+    bool _splitk;
+    double _param1;
 
     KmerMap _kmermap;
 

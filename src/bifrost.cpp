@@ -345,7 +345,8 @@ void Graph::build (const std::string& infile1,
                    size_t num_threads,
                    bool is_ref,
                    const std::string& infile2,
-                   const std::string& outpref) {
+                   const std::string& outpref,
+                   bool splitk) {
     // Set number of threads
     if (num_threads < 1)
     {
@@ -370,18 +371,21 @@ void Graph::build (const std::string& infile1,
     cout << "Graph written to " << outpref << ".gfa" << endl;
 
     // generate kmermap
-    cout << "Generating split-kmer index..." << endl;
-    index_split_kmer();
+    if (splitk)
+    {
+        cout << "Generating split-kmer index..." << endl;
+        index_split_kmer();
 
-    // write sk_index
-    std::tuple<int, int, KmerMap> for_writing = {_gap, _kmer, _kmermap};
+        // write sk_index
+        std::tuple<int, int, KmerMap> for_writing = {_gap, _kmer, _kmermap};
 
-    std::ofstream os(outpref + ".sk", std::ios::binary);
-    cereal::BinaryOutputArchive oarchive(os);
-    // write class instance to archive
-    oarchive(for_writing);
+        std::ofstream os(outpref + ".sk", std::ios::binary);
+        cereal::BinaryOutputArchive oarchive(os);
+        // write class instance to archive
+        oarchive(for_writing);
 
-    cout << "Split-kmer index written to " << outpref << ".sk" << endl;
+        cout << "Split-kmer index written to " << outpref << ".sk" << endl;
+    }
 }
 
 void Graph::read_skindex(const std::string& sk_index)
@@ -397,21 +401,30 @@ void Graph::read_skindex(const std::string& sk_index)
     _kmer = std::get<1>(for_writing);
     _kmerd = (double)_kmer;
     _kmermap = std::get<2>(for_writing);
+    _param1 = (-1/((2 * _kmerd) + _gapd));
 
     _cdbg = CompactedDBG<> (_kmer);
 }
 
 // read existing graph and index
-void Graph::read (const std::string& sk_index)
+void Graph::read (const std::string& infile)
 {
-    read_skindex(sk_index);
+    if (infile.find(".sk") != string::npos)
+    {
+        read_skindex(infile);
+        _splitk = true;
+    } else {
+        _cdbg.read(infile);
+        _kmer = _cdbg.getK();
+        _kmerd = (double) _kmer;
+        _param1 = (-1/_kmerd);
+        _splitk = false;
+    }
 }
 
 double Graph::query (const std::string& query) {
 
     // hold number of kmers
-    const size_t num_kmers = query.size() - _kmer + 1;
-    //const size_t num_split_kmers = num_kmers - (_kmer + _gap);
     int total_matches = 0;
     int total_mismatches = 0;
 
@@ -422,23 +435,12 @@ double Graph::query (const std::string& query) {
 
     for (KmerIterator it_km(query_str), it_km_end; it_km != it_km_end; ++it_km)
     {
-        // count all matches
-        kmer_vec.push_back(it_km->first.toString());
-    }
-
-    // iterate over matches, linking split-kmers
-    int ind1 = 0;
-    int ind2 = ind1 + _kmer + _gap;
-
-    // iterate over all split-kmers
-    for (; ind2 < num_kmers; ind2++)
-    {
-        // find kmer1 in _kmermap
-        auto kmer1_found = _kmermap.find(kmer_vec[ind1]);
-        if (kmer1_found != _kmermap.end())
+        // just count kmers
+        if (!_splitk)
         {
-            const auto& kmer_set = kmer1_found->second;
-            if (kmer_set.find(kmer_vec[ind2]) != kmer_set.end())
+            auto um = _cdbg.find(it_km->first);
+
+            if (!um.isEmpty)
             {
                 total_matches++;
             } else
@@ -447,10 +449,41 @@ double Graph::query (const std::string& query) {
             }
         } else
         {
-            total_mismatches += 2;
+            // count all matches
+            kmer_vec.push_back(it_km->first.toString());
         }
+    }
 
-        ind1++;
+    // count split-kmers
+    if (_splitk)
+    {
+        const size_t num_kmers = query.size() - _kmer + 1;
+        // iterate over matches, linking split-kmers
+        int ind1 = 0;
+        int ind2 = ind1 + _kmer + _gap;
+
+        // iterate over all split-kmers
+        for (; ind2 < num_kmers; ind2++)
+        {
+            // find kmer1 in _kmermap
+            auto kmer1_found = _kmermap.find(kmer_vec[ind1]);
+            if (kmer1_found != _kmermap.end())
+            {
+                const auto& kmer_set = kmer1_found->second;
+                if (kmer_set.find(kmer_vec[ind2]) != kmer_set.end())
+                {
+                    total_matches++;
+                } else
+                {
+                    total_mismatches += 2;
+                }
+            } else
+            {
+                total_mismatches += 2;
+            }
+
+            ind1++;
+        }
     }
 
     // calcaulte jaccard index
@@ -460,9 +493,8 @@ double Graph::query (const std::string& query) {
     double mash_sim = 0;
     if (jaccard > 0)
     {
-        double param1 = (-1/((2 * _kmerd) + _gapd));
         double param2 = log((2 * jaccard) / (1 + jaccard));
-        mash_sim = 1 - (param1 * param2);
+        mash_sim = 1 - (_param1 * param2);
     }
 
     return mash_sim;
