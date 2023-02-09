@@ -139,7 +139,6 @@ KmerMap generate_split_kmers(CompactedDBG<>& cdbg,
 
         const auto& start_node = complete_paths[0][0];
         auto um = cdbg.find(start_node.first, true);
-        um.strand = start_node.second;
         std::string start_str;
 
         if (start_node.second)
@@ -149,7 +148,6 @@ KmerMap generate_split_kmers(CompactedDBG<>& cdbg,
         {
             start_str = reverse_complement(um.referenceUnitigToString());
         }
-
 
         // determine number of kmers
         const size_t num_kmers = start_str.size() - overlap;
@@ -195,19 +193,31 @@ KmerMap generate_split_kmers(CompactedDBG<>& cdbg,
     }
 
     // now iterate through extended paths, only add in forward direction as will be covered by other unitig traversal
-    const int stop_idx = kmer_vec.size();
+    const int stop_idx = kmer_vec.size() - 1;
     {
         for (const auto& path : complete_paths)
         {
-            std::string path_sequence;
+            bool complete = false;
 
-            std::vector<std::string> kmer_vec_temp;
+            int ind1 = 0;
+
+            size_t kmer_count = stop_idx;
 
             for (int nidx = 1; nidx < path.size(); nidx++)
             {
                 const auto& start_node = path[nidx];
                 auto um = cdbg.find(start_node.first, true);
-                um.strand = start_node.second;
+
+                // determine position of kmers in path
+                const size_t pos = (um.size - overlap) + kmer_count;
+
+                // if unitig too short for gap, ignore and move on
+                if (pos < length)
+                {
+                    kmer_count += (um.size - overlap);
+                    continue;
+                }
+
                 std::string seq;
                 if (start_node.second)
                 {
@@ -217,38 +227,36 @@ KmerMap generate_split_kmers(CompactedDBG<>& cdbg,
                     seq = reverse_complement(um.referenceUnitigToString());
                 }
 
-                if (nidx == 1)
+                // get the sequence and iterate through kmers until satisified
+                const char *seq_cstr = seq.c_str();
+
+                int ind2 = (length + ind1) - (kmer_count + 1);
+
+                // start at matched kmer
+                KmerIterator it_km(seq_cstr),it_km_end;
+                it_km += ind2;
+                for (; it_km != it_km_end; ++it_km)
                 {
-                    path_sequence = seq;
-                } else
-                {
-                    path_sequence.append(seq.begin() + overlap, seq.end());
+                    // generate vector of all kmer strings
+                    auto kmer_str = it_km->first.toString();
+
+                    // add kmers until all kmers in original unitig can be paired
+                    kmer_map[kmer_vec[ind1]].insert(kmer_str);
+
+                    ind1++;
+                    // all kmers paired
+                    if (ind1 > stop_idx)
+                    {
+                        complete = true;
+                        break;
+                    }
                 }
-            }
 
-            // iterate over path_sequence, add to kmer_vec_temp until all kmers in initial node are paired with split kmer
-            size_t kmer_count = 0;
-            const char *um_cstr = path_sequence.c_str();
-            for (KmerIterator it_km(um_cstr); kmer_count < length; ++it_km)
-            {
-                // generate vector of all kmer strings
-                auto kmer_str = it_km->first.toString();
+                if (complete){
+                    break;
+                }
 
-                // add kmers until all kmers in original unitig can be paired
-                kmer_vec_temp.push_back(kmer_str);
-
-                kmer_count++;
-            }
-
-            int ind1 = 0;
-            int ind2 = ind1 + (length - stop_idx);
-
-            // iterate over all split-kmers
-            for (; ind1 < stop_idx; ind1++)
-            {
-                // add forward match...
-                kmer_map[kmer_vec[ind1]].insert(kmer_vec_temp[ind2]);
-                ind2++;
+                kmer_count += (um.size - overlap);
             }
         }
     }
@@ -307,10 +315,10 @@ void Graph::index_split_kmer()
     #pragma omp parallel
     {
         KmerMap kmer_map_temp;
-        #pragma omp for
+        #pragma omp for nowait
         for (auto it = head_kmer_arr.begin(); it < head_kmer_arr.end(); it++)
         {
-            _kmermap.merge(traverse_unitig(_cdbg, *it, length, overlap));
+            kmer_map_temp.merge(traverse_unitig(_cdbg, *it, length, overlap));
         }
 
         #pragma omp critical
