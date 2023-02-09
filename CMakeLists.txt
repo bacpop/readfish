@@ -40,11 +40,11 @@ target_link_libraries(query_cpp PRIVATE ${bifrost_LIBRARIES} ${z_LIBRARIES} Thre
 
 # find openmp
 if(DEFINED ENV{CONDA_PREFIX} AND (NOT APPLE OR CMAKE_COMPILER_IS_GNUCC))
-    target_link_libraries(ggCaller_cpp PRIVATE gomp)
+    target_link_libraries(query_cpp PRIVATE gomp)
 else()
     find_package(OpenMP)
     if(OpenMP_CXX_FOUND)
-        target_link_libraries(ggCaller_cpp PRIVATE OpenMP::OpenMP_CXX)
+        target_link_libraries(query_cpp PRIVATE OpenMP::OpenMP_CXX)
         MESSAGE("Found openmp")
     endif()
 endif()
