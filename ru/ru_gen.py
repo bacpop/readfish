@@ -715,20 +715,21 @@ def simple_analysis_graph(
                 exceeded_threshold = True
 
             # generate mapping
-            result = mapper.map_read(seq)
+            # if read is short, allow for further sequencing, otherwise reject.
+            if seq_len < len_cutoff:
+                mode = "no_map"
+                result = 0
+            else:
+                result = mapper.map_read(seq)
 
             # add info to debug stream
             pf.debug("{}\t{}\t{}".format(read_id, seq_len, result))
 
-            # only concerned with reads in target channels
-            if conditions[run_info[channel]].targets:
+            # only concerned with reads in target channels and above length cutoff
+            if conditions[run_info[channel]].targets and seq_len >= len_cutoff:
                 # No mappings, assume does not map well
                 if result < align_threshold:
-                    # if read is short, allow for further sequencing, otherwise reject.
-                    if seq_len < len_cutoff:
-                        mode = "no_map"
-                    else:
-                        mode = "single_off"
+                    mode = "single_off"
                 else:
                     # can only detect single mapping to graph
                     mode = "single_on"
