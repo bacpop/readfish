@@ -440,11 +440,13 @@ void Graph::read (const std::string& infile)
     }
 }
 
-double Graph::query (const std::string& query) {
+std::pair<double, double> Graph::query (const std::string& query) {
 
     // hold number of kmers
     int total_matches = 0;
     int total_mismatches = 0;
+
+    const size_t num_kmers = query.size() - _kmer + 1;
 
     // convert query to string for search in graph
     const char *query_str = query.c_str();
@@ -476,7 +478,6 @@ double Graph::query (const std::string& query) {
     // count split-kmers
     if (_splitk)
     {
-        const size_t num_kmers = query.size() - _kmer + 1;
         // iterate over matches, linking split-kmers
         int ind1 = 0;
         int ind2 = ind1 + _kmer + _gap;
@@ -516,7 +517,11 @@ double Graph::query (const std::string& query) {
         mash_sim = 1 - (_param1 * param2);
     }
 
-    return mash_sim;
+    double prop_kmers = (double)total_matches / (double)num_kmers;
+
+    std::pair<double, double> out_pair = {mash_sim, prop_kmers};
+
+    return out_pair;
 }
 
 // SKA2 functions

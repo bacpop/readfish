@@ -104,7 +104,7 @@ public:
     // read existing graph and index
     void read(const std::string &infile);
 
-    double query(const std::string &query);
+    std::pair<double, double> query(const std::string &query);
 
 private:
     // stored bifrost DBG

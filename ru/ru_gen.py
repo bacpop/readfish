@@ -720,7 +720,8 @@ def simple_analysis_graph(
                 mode = "no_map"
                 result = 0
             else:
-                result = mapper.map_read(seq)
+                result_pair = mapper.map_read(seq)
+                result = result_pair[0]
 
             # add info to debug stream
             pf.debug("{}\t{}\t{}".format(read_id, seq_len, result))
