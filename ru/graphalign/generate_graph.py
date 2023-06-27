@@ -19,9 +19,9 @@ def get_options():
                     type=str,
                     help='Output prefix for gfa file. ')
     IO.add_argument('--kmer',
-                    default=11,
+                    default=19,
                     type=int,
-                    help='Kmer size (default=11). ')
+                    help='Kmer size (default=19). ')
     IO.add_argument('--gap',
                     default=1,
                     type=int,

@@ -66,8 +66,8 @@ _cli = BASE_ARGS + (
     (
         "--align_threshold",
         dict(
-            help="Read alignment threshold, prop. identity of read to graph."
-                 "Default = 0.5",
+            help="Read alignment threshold, prop. identity of read to graph. Default = 0.75"
+                 "Default = 0.75",
             default=0.5,
             type=float,
         ),
@@ -76,8 +76,8 @@ _cli = BASE_ARGS + (
         "--len_cutoff",
         dict(
             help="Reads below this length are allowed to fall below align_threshold, as may be too short to map."
-                 "Default = 200 bp",
-            default=200,
+                 "Default = 50 bp",
+            default=50,
             type=int,
         ),
     ),
