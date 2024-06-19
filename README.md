@@ -1,4 +1,8 @@
-# ![alt text](examples/images/readfish_logo.jpg "ReadFish Logo")
+# GNASTy: Graph-based Nanopore Adaptive Sampling Typing
+
+**This is a fork of the original ReadFish repository, implementing a graph-based method for alignment**
+
+## Setting up ReadFish
 
 If you are anything like us, reading a README is the last thing you do when running code. 
 PLEASE DON'T DO THAT FOR READFISH. This will effect changes to your sequencing and - 
@@ -31,14 +35,17 @@ example tests).
 
 Citation
 --------
-The paper is available at [nature biotechnology](https://dx.doi.org/10.1038/s41587-020-00746-x) 
-and [bioRxiv](https://dx.doi.org/10.1101/2020.02.03.926956)
-
 If you use this software please cite: [10.1038/s41587-020-00746-x](https://dx.doi.org/10.1038/s41587-020-00746-x) 
 
 > Readfish enables targeted nanopore sequencing of gigabase-sized genomes  
 > Alexander Payne, Nadine Holmes, Thomas Clarke, Rory Munro, Bisrat Debebe, Matthew Loose  
 > Nat Biotechnol (2020); doi: https://doi.org/10.1038/s41587-020-00746-x
+
+Also please cite: [10.1101/2024.02.11.579857](https://doi.org/10.1101/2024.02.11.579857)
+
+> Graph-based Nanopore Adaptive Sampling with GNASTy enables sensitive pneumococcal serotyping in complex samples  
+> Samuel T. Horsfield, Basil Fok, Yuhan Fu, Paul Turner, John A. Lees, Nicholas J. Croucher  
+> bioRxiv (2024); doi: https://doi.org/10.1101/2024.02.11.579857
 
 Installation development version
 ------------
