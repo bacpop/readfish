@@ -2,7 +2,7 @@
 
 **This is a fork of the original ReadFish repository, implementing a graph-based method for alignment**
 
-## Setting up ReadFish
+## Before you use ReadFish
 
 If you are anything like us, reading a README is the last thing you do when running code. 
 PLEASE DON'T DO THAT FOR READFISH. This will effect changes to your sequencing and - 
@@ -33,8 +33,7 @@ This code is run at your own risk as it DOES affect sequencing output. You
 are **strongly** advised to test your setup prior to running (see below for 
 example tests).
 
-Citation
---------
+## Citation
 If you use this software please cite: [10.1038/s41587-020-00746-x](https://dx.doi.org/10.1038/s41587-020-00746-x) 
 
 > Readfish enables targeted nanopore sequencing of gigabase-sized genomes  
@@ -47,24 +46,53 @@ Also please cite: [10.1101/2024.02.11.579857](https://doi.org/10.1101/2024.02.11
 > Samuel T. Horsfield, Basil Fok, Yuhan Fu, Paul Turner, John A. Lees, Nicholas J. Croucher  
 > bioRxiv (2024); doi: https://doi.org/10.1101/2024.02.11.579857
 
-Installation development version
-------------
-```bash
-# Make a virtual environment
-python3 -m venv readfish
-. ./readfish/bin/activate
-pip install --upgrade pip
+## Installation
 
-# Install our ReadFish Software
-pip install git+https://github.com/nanoporetech/read_until_api@v3.0.0
-pip install git+https://github.com/LooseLab/readfish@guppy_6_minknow_5
+Installation via pip and conda is highly recommended. First install [miniconda](https://docs.conda.io/en/latest/miniconda.html), then add the correct channels:
 
-# Install ont_pyguppy_client_lib that matches your guppy server version. E.G.
-pip install ont_pyguppy_client_lib==4.0.11
+```
+conda config --add channels defaults
+conda config --add channels bioconda
+conda config --add channels conda-forge
 ```
 
-Usage
------
+Then install ReadFish and GNASTy using the `readfish.yml` file.
+
+```bash
+conda create -f readfish.yml
+```
+
+## Usage
+
+For generating a reference de bruijn graph for alignment, the following commands can be run:
+
+```bash
+usage: readfish ru_generate_graph [-h] [--refs REFS] [--reads READS] [--out OUT]
+                                  [--kmer KMER] [--gap GAP] [--threads THREADS]
+                                  [--splitkmer]
+
+Generates Bifrost graph in gfa format.
+
+options:
+  -h, --help         show this help message and exit
+
+Input/Output options:
+  --refs REFS        List of files paths to assembly fasta files to generate
+                     gfa from, one per line.
+  --reads READS      List of files paths to reads fasta files to generate gfa
+                     from, one per line.
+  --out OUT          Output prefix for gfa file.
+  --kmer KMER        Kmer size (default=19).
+  --gap GAP          Gap size for split-kmers (default=1).
+  --threads THREADS  Number of threads (default=1).
+  --splitkmer        Use split-kmers. Note: Index generation will take a long
+                     time (default=False).
+```
+
+This will generate a graph in `.gfa` format which can be used in graph alignment.
+
+For adaptive sampling, the following commands can be run:
+
 ```bash
 # check install
 $ readfish
@@ -86,9 +114,18 @@ optional arguments:
   --version             show program's version number and exit
 
 See '<command> --help' to read about a specific sub-command.
+```
 
-# example run command - change arguments as necessary:
-$ readfish targets --experiment-name "Test run" --device MN17073 --toml example.toml --log-file RU_log.log
+To run in graph alignment mode, use the following commands, replacing arguments as necessary. The path to the `.gfa` should be specified in the TOML file (see next section).
+
+```
+readfish targets --device [device] --experiment-name [name] --toml /path/to/toml --logfile [logfile] --port 9502 --graph True --align_threshold [threshold] --len_cutoff [cutoff]
+```
+
+The sequencing procesess may be locked to the `minknow` user, meaning that ReadFish will not be able to run. You can instead run ReadFish as the `minknow` user using the below command. However, you must have `sudo` privileges:
+
+```
+sudo runuser minknow -c ‘/path/to/readfish targets --device [device] --experiment-name [name] --toml /path/to/toml --logfile [logfile] --port 9502 --graph True --align_threshold [threshold] --len_cutoff [cutoff]
 ```
 
 TOML File
