@@ -182,35 +182,12 @@ and configure a [TOML](TOML.md) file. Here we provide an [example TOML file](exa
     ```bash
     curl -O https://github.com/LooseLab/readfish/blob/master/examples/human_chr_selection.toml
     ```
-1. Modify the `reference` field in the file to be the full path to a [minimap2](https://github.com/lh3/minimap2) index of the human genome.
-1. Modify the `targets` fields for each condition to reflect the naming convention used in your index. This is the sequence name only, up to but not including any whitespace.
-e.g. `>chr1 human chromosome 1` would become `chr1`. If these names do not match, then target matching will fail.
-1. We provide a [JSON schema](readfish/static/readfish_toml.schema.json) and a script for validating 
-configuration files which will let you check if the toml will drive an experiment as you expect:
-    
-    ```bash
-    readfish validate human_chr_selection.toml
-    ```
-
-    Errors with the configuration will be written to the terminal along with a text description of the conditions for the experiment as below.
-    
-    ```text
-    readfish validate examples/human_chr_selection.toml
-    😻 Looking good!
-    Generating experiment description - please be patient!
-    This experiment has 1 region on the flowcell
-
-    Using reference: /path/to/reference.mmi
-
-    Region 'select_chr_21_22' (control=False) has 2 targets of which 2 are
-    in the reference. Reads will be unblocked when classed as single_off
-    or multi_off; sequenced when classed as single_on or multi_on; and
-    polled for more data when classed as no_map or no_seq.
-    ```         
-1. If your toml file validates then run the following command:
+1. Modify the `reference` field in the file to be the full path to a [bifrost](https://github.com/pmelsted/bifrost) index (`.gfa`) of a specific human chromosomes, e.g. chromosomes 21 and 22, using the `ru_generate_graph` command documented above.     
+1. Run the following command:
     ```bash
     readfish targets --device <YOUR_DEVICE_ID> \
                   --experiment-name "RU Test basecall and map" \
+                  --graph True --align_threshold 0.75 --len_cutoff 50 \
                   --toml <PATH_TO_TOML> \
                   --log-file ru_test.log
     ```
@@ -234,6 +211,7 @@ configuration files which will let you check if the toml will drive an experimen
     ```bash
     readfish targets --device <YOUR_DEVICE_ID> \
                   --experiment-name "RU Test basecall and map" \
+                  --graph True --align_threshold 0.75 --len_cutoff 50 \
                   --toml <PATH_TO_TOML> \
                   --log-file ru_test.log
     ```
@@ -242,7 +220,7 @@ configuration files which will let you check if the toml will drive an experimen
         ![alt text](examples/images/PlaybackRunUnblock.png "Playback Unblock Image")
 Zoomed in on the unblocks: 
         ![alt text](examples/images/PlaybackRunUnblockCloseUp.png "Closeup Playback Unblock Image")
- 4. Run `readfish summary` to check if your run has performed as expected. This file requires the path to your toml file followed by the path to your fastq reads. Typical results are provided below and show longer mean read lengths for the two selected chromosomes (here chr21 and chr22). Note the mean read lengths observed will be dependent on system performance. Optimal guppy configuration for your system is left to the user.
+ 4. Run `readfish summary` to check if your run has performed as expected. This file requires the path to a toml file with a [minimap2](https://github.com/lh3/minimap2) of the full human genome followed by the path to your fastq reads. Typical results are provided below and show longer mean read lengths for the two selected chromosomes (here chr21 and chr22). Note the mean read lengths observed will be dependent on system performance. Optimal guppy configuration for your system is left to the user.
      ```text
      contig  number      sum   min     max    std   mean  median     N50
        chr1    1326  4187614   142  224402  14007   3158     795   48026
