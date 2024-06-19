@@ -81,6 +81,12 @@ sets out the experimental conditions across the flowcell. The allowed keys are:
 reference = "/absolute/path/to/reference.mmi"
 ```
 
+If using a graph index for graph alignment, specify this here:
+```toml
+[conditions]
+reference = "/absolute/path/to/reference.gfa"
+```
+
 ### Non-barcoded TOMLs
 For non-barcoded experiments, the table can have sub-tables that determine the experimental conditions 
 to apply to the flowcell, these should be sequentially numbered like so and will partition the flow 
@@ -139,6 +145,14 @@ multi_off = "unblock"
 no_seq = "proceed"
 no_map = "proceed"
 ```
+
+**Note when using graph alignment**
+
+For graph alignment, the following parameters are ignored, as they are overwritten by the `--len_cutoff` and `--align_threshold` command line arguments, or are not available using a graph.
+- `targets`
+- `multi_on`
+- `multi_off`
+- `no_seq`
 
 ### Conditions sub-tables
 
