@@ -146,14 +146,6 @@ no_seq = "proceed"
 no_map = "proceed"
 ```
 
-**Note when using graph alignment**
-
-For graph alignment, the following parameters are ignored, as they are overwritten by the `--len_cutoff` and `--align_threshold` command line arguments, or are not available using a graph.
-- `targets`
-- `multi_on`
-- `multi_off`
-- `no_seq`
-
 ### Conditions sub-tables
 
 Each conditions sub-table must contain all of the following keys, these are the same between barcoded and non-barcoded toml files.
@@ -200,6 +192,14 @@ selected combination.
     <td>120</td>
   </tr>
 </table>
+
+#### When using graph alignment
+
+For graph alignment, the following parameters are ignored, as they are overwritten by the `--len_cutoff` and `--align_threshold` command line arguments, or are not available using a graph.
+- `targets`
+- `multi_on`
+- `multi_off`
+- `no_seq`
 
 ### Target Types
 
