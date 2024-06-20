@@ -201,6 +201,8 @@ For graph alignment, the following parameters are ignored, as they are overwritt
 - `multi_off`
 - `no_seq`
 
+You should also set `min_chunks = 0` and `max_chunks = 0`, as read length is controlled by `--len_cutoff`
+
 ### Target Types
 
 The targets parameter can accept either a string or an array of strings. If a
