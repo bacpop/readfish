@@ -1,17 +1,17 @@
 [caller_settings]
-config_name = "dna_r9.4.1_450bps_fast"
-host = "127.0.0.1"
+config_name = "dna_r10.4.1_e8.2_400bps_fast"
+host = "ipc:///tmp/.guppy"
 port = 5555
 
 [conditions]
-reference = "/path/to/reference.mmi"
+reference = "/path/to/reference.gfa"
 
 [conditions.0]
-name = "select_chr_21_22"
+name = "select_chr"
 control = false
 min_chunks = 0
-max_chunks = 12
-targets = ["chr21", "chr22"]
+max_chunks = 0
+targets = ["NA"]
 single_on = "stop_receiving"
 multi_on = "stop_receiving"
 single_off = "unblock"
