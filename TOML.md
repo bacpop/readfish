@@ -13,7 +13,6 @@ Table of Contents
  - [Config sections](#config-sections)
    - [Guppy connection](#guppy-connection)
    - [Conditions](#conditions)
- - [Validating a TOML](#validating-a-toml)
  
  
 TOML files
@@ -47,103 +46,22 @@ port = "REMOTE_GUPPY_SERVER_PORT"
 
 ```toml
 [caller_settings]
-config_name = "dna_r9.4.1_450bps_fast"
-host = "127.0.0.1"
+config_name = "dna_r10.4.1_e8.2_400bps_fast"
+host = "ipc:///tmp/.guppy"
 port = 5555
 ```
 
 ### Barcoding
 
-When barcoding the additional `barcode_kits` parameter is required:
-
-```toml
-[caller_settings]
-config_name = "dna_r9.4.1_450bps_fast"
-host = "127.0.0.1"
-port = 5555
-barcode_kits = ["EXP-NBD196"]
-```
+Although Readfish enables per-barcode targeting, GNASTy has not be formally tested using barcodes. See the main [Readfish](https://github.com/LooseLab/readfish) repository if you wish to try this.
 
 Conditions
 ---
-The `conditions` table holds the location of your minimap2 reference file and 
-sets out the experimental conditions across the flowcell. The allowed keys are:
-
-|          Key |       Type      | Values | Description |
-|-------------:|:---------------:|:------:|:------------|
-| reference | string | N/A | Required the absolute path for a minimap2 index |
-| maintain_order | bool| N/A | (Optional) If `true` condition regions are ordered by their sequential numbering in the TOML file|
-| axis | int | [0, 1] | (Optional) The axis that the flowcell is divided on. 0 is rows (left -> right), 1 is columns (top -> bottom); default is 1|
-
-
-```toml
-[conditions]
-reference = "/absolute/path/to/reference.mmi"
-```
 
 If using a graph index for graph alignment, specify this here:
 ```toml
 [conditions]
 reference = "/absolute/path/to/reference.gfa"
-```
-
-### Non-barcoded TOMLs
-For non-barcoded experiments, the table can have sub-tables that determine the experimental conditions 
-to apply to the flowcell, these should be sequentially numbered like so and will partition the flow 
-cell into experimental regions:
-
-```toml
-[conditions.0]
-# ...
-
-[conditions.1]
-# ...
-```
-
-### Barcoded TOMLs
-There are two required tables `conditions.classified` and `conditions.unclassified`.
-These are the default actions to take for reads that do not have more specific configuration.
-For specific barcodes more nuanced configuration can be specified using the barcode name, e.g. `conditions.barcode01` for "barcode01".
-
-```toml
-[conditions.unclassified]
-name = "unclassified_reads"
-control = false
-min_chunks = 0
-max_chunks = 2
-targets = []
-single_on = "unblock"
-multi_on = "unblock"
-single_off = "unblock"
-multi_off = "unblock"
-no_seq = "proceed"
-no_map = "proceed"
-
-[conditions.classified]
-name = "classified_reads"
-control = false
-min_chunks = 0
-max_chunks = 2
-targets = []
-single_on = "unblock"
-multi_on = "unblock"
-single_off = "unblock"
-multi_off = "unblock"
-no_seq = "proceed"
-no_map = "proceed"
-
-[conditions.barcode01]
-name = "barcode01_targets"
-control = false
-min_chunks = 0
-max_chunks = 2
-targets = ["chr1", "chr2"]
-single_on = "stop_receiving"
-multi_on = "stop_receiving"
-single_off = "unblock"
-multi_off = "unblock"
-no_seq = "proceed"
-no_map = "proceed"
 ```
 
 ### Conditions sub-tables
@@ -201,128 +119,6 @@ For graph alignment, the following parameters are ignored, as they are overwritt
 - `multi_off`
 - `no_seq`
 
-You should also set `min_chunks = 0` and `max_chunks = 0`, as read length is controlled by `--len_cutoff`
+You should also set `min_chunks = 0` and `max_chunks = 0`, as read length is controlled by `--len_cutoff`.
 
-### Target Types
-
-The targets parameter can accept either a string or an array of strings. If a
-string is provided this should be a fully qualified path to a text file which 
-consists of genomic targets in the [formats outlined below](#target-formats). 
-When an array is given all the elements in the array must conform with the 
-[formats below](#target-formats).
-
-### Target Formats
-
-When specifying the genomic targets to consider in a ReadFish experiment we 
-currently accept two formats `chromosome` or `coordinates`. 
-
-EG `chromosome`: 
- - `>chr1 Human chromosome 1` becomes `chr1`
- 
-Targets given in this format specify the entire contig as a target to select for 
-or against.
- 
-Alternatively, for `coordinates` the format `contig,start,stop,strand` is used:
- - `chr1,10,20,+`
- 
-Targets given in this format will only select (for or against) reads where the 
-alignment start position is within the region on the given strand. 
-
-Validating a TOML
-===
-
-We provide a [JSON schema](ru/static/targets.schema.json) for validating 
-configuration files:
-
-```bash
-ru_validate experiment_conf.toml
-```
-
-Any errors with the configuration will be written to the terminal. 
-
-As an example - if the reference is missing you will see:
-
-```text
-ru_validate examples/human_chr_selection.toml
-😻 Looking good!
-Generating experiment description - please be patient!
-This experiment has 1 region on the flowcell
-
-No reference file provided
-
-Region 'select_chr_21_22' (control=False) has 3 targets. Reads will be
-unblocked when classed as single_off or multi_off; sequenced when
-classed as single_on or multi_on; and polled for more data when
-classed as no_map or no_seq.
-```
-
-The experiment report will tell you if targets are not represented in the reference (this is not a coordinate check, but is a chromosome name check):
-```text
-ru_validate examples/human_chr_selection.toml
-😻 Looking good!
-Generating experiment description - please be patient!
-This experiment has 1 region on the flowcell
-
-Using reference: /path/to/reference.mmi
-
-Region 'select_chr_21_22' (control=False) has 3 targets of which 2 are
-in the reference. Reads will be unblocked when classed as single_off
-or multi_off; sequenced when classed as single_on or multi_on; and
-polled for more data when classed as no_map or no_seq.
-
-```
-
-If the toml fails validation (i.e fields are missing or have non permitted values) you will see the following - note the problem field is reported on the second line. 
-
-```text
-ru_validate examples/human_chr_selection.toml
-😾 this TOML file has failed validation. See below for details:
-'min_chunks' is a required property
-
-Failed validating 'required' in schema['properties']['conditions']['patternProperties']['^[0-9]+$']:
-    {'additionalProperties': False,
-     'properties': {'control': {'type': 'boolean'},
-                    'max_chunks': {'minimum': 1, 'type': 'number'},
-                    'min_chunks': {'minimum': 0, 'type': 'number'},
-                    'multi_off': {'$ref': '#/definitions/modes',
-                                  'type': 'string'},
-                    'multi_on': {'$ref': '#/definitions/modes',
-                                 'type': 'string'},
-                    'name': {'minLength': 1, 'type': 'string'},
-                    'no_map': {'$ref': '#/definitions/modes',
-                               'type': 'string'},
-                    'no_seq': {'$ref': '#/definitions/modes',
-                               'type': 'string'},
-                    'single_off': {'$ref': '#/definitions/modes',
-                                   'type': 'string'},
-                    'single_on': {'$ref': '#/definitions/modes',
-                                  'type': 'string'},
-                    'targets': {'items': {'oneOf': [{'pattern': '^[^,]+$'},
-                                                    {'pattern': '^.+,[0-9]+,[0-9]+,[+-]$'}],
-                                          'type': 'string'},
-                                'type': ['array', 'string']}},
-     'required': ['name',
-                  'max_chunks',
-                  'min_chunks',
-                  'targets',
-                  'single_on',
-                  'single_off',
-                  'multi_on',
-                  'multi_off',
-                  'no_seq',
-                  'no_map',
-                  'control'],
-     'type': 'object'}
-
-On instance['conditions']['0']:
-    {'control': False,
-     'max_chunks': inf,
-     'multi_off': 'unblock',
-     'multi_on': 'stop_receiving',
-     'name': 'select_chr_21_22',
-     'no_map': 'proceed',
-     'no_seq': 'proceed',
-     'single_off': 'unblock',
-     'single_on': 'stop_receiving',
-     'targets': ['chr21', 'chr22']}
-```
+See the [example](https://github.com/samhorsfield96/readfish/blob/graph_alignment_bifrost/examples/human_chr_selection.toml) TOML file for running with GNASTy.
