@@ -180,10 +180,10 @@ To test selective sequencing you must have access to a
 and configure a [TOML](TOML.md) file. Here we provide an [example TOML file](examples/human_chr_selection.toml).
 1. First make a local copy of the example TOML file:
     ```bash
-    curl -O https://github.com/LooseLab/readfish/blob/master/examples/human_chr_selection.toml
+    curl -O https://github.com/samhorsfield96/readfish/blob/graph_alignment_bifrost/examples/human_chr_selection.toml
     ```
 1. Modify the `reference` field in the file to be the full path to a [bifrost](https://github.com/pmelsted/bifrost) index (`.gfa`) of a specific human chromosomes, e.g. chromosomes 21 and 22, using the `ru_generate_graph` command documented above.     
-1. Run the following command:
+1. Run the following command (if this does not work use the `sudo` command above):
     ```bash
     readfish targets --device <YOUR_DEVICE_ID> \
                   --experiment-name "RU Test basecall and map" \
@@ -220,7 +220,7 @@ and configure a [TOML](TOML.md) file. Here we provide an [example TOML file](exa
         ![alt text](examples/images/PlaybackRunUnblock.png "Playback Unblock Image")
 Zoomed in on the unblocks: 
         ![alt text](examples/images/PlaybackRunUnblockCloseUp.png "Closeup Playback Unblock Image")
- 4. Run `readfish summary` to check if your run has performed as expected. This file requires the path to a toml file with a [minimap2](https://github.com/lh3/minimap2) of the full human genome followed by the path to your fastq reads. Typical results are provided below and show longer mean read lengths for the two selected chromosomes (here chr21 and chr22). Note the mean read lengths observed will be dependent on system performance. Optimal guppy configuration for your system is left to the user.
+ 4. Run `readfish summary` to check if your run has performed as expected. This file requires the path to a toml file (get this from the original [Readfish](https://github.com/LooseLab/readfish) repository) with a [minimap2](https://github.com/lh3/minimap2) of the full human genome followed by the path to your fastq reads. Typical results are provided below and show longer mean read lengths for the two selected chromosomes (here chr21 and chr22). Note the mean read lengths observed will be dependent on system performance. Optimal guppy configuration for your system is left to the user.
      ```text
      contig  number      sum   min     max    std   mean  median     N50
        chr1    1326  4187614   142  224402  14007   3158     795   48026
