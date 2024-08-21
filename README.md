@@ -22,6 +22,8 @@ the read in progress and so direct sequencing capacity towards reads of interest
 **This implementation of ReadFish requires Guppy version >= 6.0.0 and MinKNOW core version >= 5.0.0 . It will not work on earlier versions.** 
 
 
+**All testing in the GNASTy manuscript was conducted with MinKNOW GUI v22.12.7, MinKNOW core v5.4.3, and Guppy v6.4.6. GNASTy has not been tested on later versions, so use at your own risk.**
+
 **Currently we only recommend LINUX for running ReadFish. We have not had 
 effective performance on other platforms to date.**
 
